@@ -141,6 +141,10 @@ This will ensure the file is linked correctly and you can make use of this mixin
 
 Which will ensure the unicode bindings are always correct even when the svg unicode order changes.
 
+### Gulp Roadmap
+
+- Fix the problem of generating a `./dist` folder when one does not exists. Everything works, but with the dist folder it will start with errors.
+
 ## Editor (v.1@20-03-2018)
 
 The editor will allow you to open the JSON files, edit them, and then save them out again, allowing easier changes to content. It will read templates and use a temporary folder defined in settings. Run the Editor with the following command:
