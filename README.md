@@ -153,8 +153,8 @@ and then navigate to it at `localhost:3003`.
 - Add the possibility to predefine the type of input to allow and use in `predefined`:
 
 
-	portfolio.list = { title: 'My Title', content: 'my Content' }
-	portfolio.list.content = 'wysiwyg';
+	`portfolio.list = { title: 'My Title', content: 'my Content' }`
+	`portfolio.list.content = 'wysiwyg';`
 
 
 (the above would make the content an HTML editor. This will only work if the value of the key is a string and not an object, so every specific type would need to be defined there separately.)
