@@ -192,6 +192,7 @@ function gulp_editorServer(){
 		}).map( file => path + file )) );
 		
 		console.log( '[list] Updated file and template list' );
+		console.log( allTemplates );
 		
 	}
 	function overview( messages, res ){
@@ -233,9 +234,9 @@ function gulp_editorServer(){
 		
 		// Set the `in` to the template JSON file.
 		
-		json.meta.in = json.meta.in.replace( '.njks', '.json' );
-		
-		let template = JSON.parse( fs.readFileSync( json.meta.in ).toString() );
+		let template = !allTemplates[ templateIndex ]
+			? JSON.parse( fs.readFileSync( json.meta.in ).toString() )
+			: json;
 		
 		// Create some predefined things like templates to select.
 		// Hide the self value and the predefined value in the editor.
@@ -251,6 +252,7 @@ function gulp_editorServer(){
 			
 		}, {});
 		
+		json.meta.out = json.meta.out || './';
 		json.meta.self = allFiles[ jsonIndex ] || '';
 		
 		
