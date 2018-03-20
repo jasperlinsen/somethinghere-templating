@@ -96,7 +96,7 @@ This is because it allows every piece of content to be stored in its own JSON fi
 
 An `add` and `remove` button will be added by the editor, and clicking add will create a new instance of the predefined object.
 
-**Every template requires a `template.json` file as well, which is an empty version of the data structure. It needs to be place right next to the template in the template directory. This is for the editor to be able to add new pages.**
+**Every template requires a `template.json` file as well, which is an empty version of the data structure. It needs to be placed right next to the template in the template directory. This is for the editor to be able to add new pages. The edtior does not really care where your templates are, it cares where the JSON files point to.**
 
 ### Files
 
@@ -144,11 +144,13 @@ and then navigate to it at `localhost:3003`.
 
 ### Editor Roadmap
 
+- Potentially include the editor default JSON in the `njks` file using a `{# json #}` header.
 - Make editing more comfortable (not just basic inputs).
 - Add the possibility to predefine the type of input to allow and use in `predefined`:
 
+
 	portfolio.list = { title: 'My Title', content: 'my Content' }
-	portfolio.list.content = 'html';
+	portfolio.list.content = 'wysiwyg';
 
-(the above would make the content an HTML editor. This will only work if the value of the key is a string and not an object, so every specific editor would need to be defined there separately.
 
+(the above would make the content an HTML editor. This will only work if the value of the key is a string and not an object, so every specific type would need to be defined there separately.)
