@@ -323,8 +323,6 @@ function make_json_string( data, path ){
 			
 		});
 		
-		console.log( json, predefined, input );
-		
 	} else if( typeof predefined === 'string' ){
 		
 		input.setAttribute( 'data-editor', predefined );

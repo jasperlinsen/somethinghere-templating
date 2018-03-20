@@ -13,7 +13,7 @@
 <main>
 	{% import './macros/header.njks' as header %}
 	{{ header.render( 'Editor', { back: '/' } ) }}
-	<article>{{ json | safe }}</article>
+	<article></article>
 	{% import './macros/footer.njks' as footer %}
 	{{ footer.render([
 		'<input type="button" value="save" id="save" />'
@@ -33,7 +33,7 @@ var editor = main.querySelector( 'article' );
 
 saveButton.addEventListener( 'click', event_save );
 
-make_json_editor_init( JSON.parse( editor.textContent ), editor );
+make_json_editor_init( JSON.parse( `{{ json | safe }}` ), editor );
 
 </script>
 
