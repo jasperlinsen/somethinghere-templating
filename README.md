@@ -1,6 +1,6 @@
 # Something Here Templating
 
-For my sote (somethinghere.net) I have been working at making a standardised templating system using a combination of Nunjucks and my own node stuff. This includes a convenient template editor (allows you to edit and add data files), default SASS/Compass compiler, Javascript compiler and Nunjucks processor.
+For my site (somethinghere.net) I have been working at making a standardised templating system using a combination of Nunjucks and my own node stuff. This includes a convenient template editor (allows you to edit and add data files), default SASS/Compass compiler, Javascript compiler and Nunjucks processor.
 
 __This document was last updated 20/03/2018. At this time I have not chosen a license yet, so this code is currently (C) Something Here 2018.__
 
