@@ -1,0 +1,154 @@
+# Something Here
+
+## Install
+
+Run the following commands in your terminal:
+
+	npm install
+
+Make sure `compass` is updated to the latest version, as well as `sass`.
+
+## Run
+
+Use the following command to do a default run:
+
+	gulp
+
+Use one of the following to run as production or development:
+
+	gulp --prd
+	gulp --dev
+
+__Internally this will set settings.mode to MODE_PRODUCTION or MODE_DEVELOPMENT__
+
+Use one of the following commands to run sub tasks:
+
+	gulp css
+	gulp scripts
+	gulp content
+	gulp files
+	gulp icons
+
+Append any of the above tasks with `--prd` or `--dev` to run their production and development counterparts, which will minimise code and file size where available.
+
+Alternatively, there is also a way to edit content in `gulp editor`. See `Editor` below.
+
+## Gulp Structure
+
+### Gulpsettings.js
+
+Use this to set global settings used by Gulp, such as server ports and default modes. Do not touch the constants unless you know what you are doing.
+
+### Gulppaths.js
+
+This file contains all paths it needs to read and output `css`, `scripts`, `nunjucks` and `files`. The following structure is uniform across this file:
+
+#### In
+
+	Array[ String [, ...]]
+
+An array of **file** selection paths. Every path can contain multiple files, but each path will be read separately by the builder. This way you can run to many different paths in one go. Each of these pahts will be output in the `out` section (see below) at their corresponding index. If there is no corresponding index, the last `out` path available will be used.
+
+__Example__ `[ './src/css/*.scss' ]`
+
+#### Out
+
+	Array[ String [, ...]]
+
+An array of **directory** paths where the corresponding index of files must be written to. The filenames depend on the content, so these are strictly directory paths. If this array is shorter than the `in` array, any indexes in `in` larger than the length will use the last item in the `out` paths.
+
+__Example__ `[ './dist/css/' ]`
+
+#### Watch
+
+	Array[ String [, ...]]
+
+An array of **file** selection paths. The paths that must be watched for file changes to run the corresponding task.
+
+__Example__ `[ './src/css/**/*.scss' ]`
+
+## Gulp Details
+
+### Scripts
+
+Scripts are transpiled with Babel with the preset `env`. They are also compressed in `--prd` mode.
+
+### CSS
+
+Stylesheets are compiled through Compass, and will output as `nested` in `--dev` and `compressed` in `--prd`. In `--prd` it will also auto prefix with the preset `last 2 versions`, removing the need to write your own prefixes.
+
+### Templating
+
+Templates are parsed using Nunjucks, and use a custom data file with the following structure:
+
+	{
+		meta: {
+			in: '[PATH/TO/TEMPLATE].njks',
+			out: '[PATH/TO/OUTPUT/FROM/content.out/]',
+			predefined: {}
+		},
+		data: {}
+	}
+
+This is because it allows every piece of content to be stored in its own JSON file, as well as edit JSON files using the Editor (v0.1) by dropping the JSON file and saving it back out. The `meta/data` split is required for Gulp to process your files properly. It also does not accept wildcards in it's `in` or `out`, only folders, and it will read any JSON files it finds there. `predefined` is an object that contains paths of data that can be manipulated (like adding an item to an array). If, for example, you have a list which can be manipulated in the editor, it could like like this in the `predefined` object:
+
+	mysection.mylist: { title: 'My Default Title' }
+
+An `add` and `remove` button will be added by the editor, and clicking add will create a new instance of the predefined object.
+
+**Every template requires a `template.json` file as well, which is an empty version of the data structure. It needs to be place right next to the template in the template directory. This is for the editor to be able to add new pages.**
+
+### Files
+
+Files will be copied as-is and the structure will be dumped into the respective out folder without changes.
+
+### Icons
+
+Icons will generate icon fonts. It will also generate these files:
+
+	_[fontname].scss
+	[fontname].css
+	[fontname].woff
+	[fontname].ttf
+	[fontname].eot
+
+The best way to include these in your site is to set the `out` to somewhere in a folder that is being watched by the `files` task, which will then copy them over. In your `scss`, be sure to include both the `scss` and an import to the path in the distribution. If, for example, your setup looks like this:
+
+	css.in: src/css/main.scss
+	css.out: dest/css/
+	
+	files.in: src/files/fonts/**/*
+	files.out: dist/fonts
+	
+	icons.in: src/icons/**.svg
+	icons.out: src/files/fonts/
+
+Then in your `main.scss` file, use the following two lines:
+
+	@import '../files/fonts/_icons.scss'
+	@impurt url( '../fonts/icons.css' );
+	
+This will ensure the file is linked correctly and you can make use of this mixin in SCSS:
+
+	@include icons( svgfilename );
+
+Which will ensure the unicode bindings are always correct even when the svg unicode order changes.
+
+## Editor (v.1@20-03-2018)
+
+The editor will allow you to open the JSON files, edit them, and then save them out again, allowing easier changes to content. It will read templates and use a temporary folder defined in settings. Run the Editor with the following command:
+	
+	gulp editor
+
+and then navigate to it at `localhost:3003`.
+
+### Editor Roadmap
+
+- Make editing more comfortable (not just basic inputs).
+- Add the possibility to predefine the type of input to allow and use in `predefined`:
+
+	portfolio.list = { title: 'My Title', content: 'my Content' }
+	portfolio.list.content = 'html';
+
+(the above would make the content an HTML editor. This will only work if the value of the key is a string and not an object, so every specific editor would need to be defined there separately.
+

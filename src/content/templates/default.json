@@ -1,0 +1,23 @@
+{
+	"meta":{
+		"in":"./src/content/templates/default.njks",
+		"out":"",
+		"predefined":{
+			"sections": {
+				"type":"",
+				"title":"My Title",
+				"content":"My Content"
+			},
+			"sections.content":"wysiwyg",
+			"sections.type":{
+				"header":"header",
+				"section":"section",
+				"footer":"footer"
+			}
+		}
+	},
+	"data":{
+		"title":"My Title",
+		"sections":[]
+	}
+}

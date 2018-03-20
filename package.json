@@ -1,0 +1,33 @@
+{
+  "name": "somethinghere",
+  "version": "1.0.0",
+  "description": "Dev Package for SomethingHere.net",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jasper Linsen",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "browser-sync": "^2.23.6",
+    "browsersync": "0.0.1-security",
+    "codeflask": "^0.3.0",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^5.0.0",
+    "gulp-babel": "^7.0.1",
+    "gulp-browserify": "^0.5.1",
+    "gulp-compass": "^2.1.0",
+    "gulp-iconfont": "^9.1.0",
+    "gulp-jslint": "^1.0.10",
+    "gulp-plumber": "^1.2.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-sourcemaps": "^2.6.4",
+    "gulp-uglify": "^3.0.0",
+    "gulp-watch": "^5.0.0",
+    "mkdirp": "^0.5.1",
+    "nunjucks": "^3.0.1",
+    "three": "^0.89.0"
+  }
+}

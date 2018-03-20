@@ -1,0 +1,516 @@
+@import '../../../css/definitions';
+
+* {
+
+	box-sizing: border-box;
+
+}
+html, body {
+	
+	height: 100%;
+	
+}
+body {
+	
+	font-family: font( body );
+	background: color( bg );
+	
+}
+label {
+	
+	color: #666;
+	padding: 10px 0;
+	font-size: .8em;
+	
+	&:before {
+		
+		content: '';
+		display: inline-block;
+		width: 0;
+		height: 0;
+		border-top: 5px solid transparent;
+		border-bottom: 5px solid transparent;
+		border-left: 5px solid #666;
+		margin: 0 10px 0 0;
+		vertical-align: middle;
+		transition: transform .4s;
+		transform: rotateZ( 0deg );
+		
+	}
+	
+	+ [type="array"],
+	+ [type="object"] {
+		
+		max-height: 0;
+		overflow: hidden;
+		padding: 0;
+		
+	}
+	
+	+ input,
+	+ textarea,
+	+ .CodeFlask,
+	+ select {
+		
+		display: none;
+		
+	}
+	
+	&.expand {
+		
+		&:before {
+		
+			transform: rotateZ( 90deg );
+			
+		}
+	
+		+ input,
+		+ textarea,
+		+ .CodeFlask,
+		+ select  {
+		
+			display: block;
+		
+		}
+		
+		+ [type="array"],
+		+ [type="object"] {
+		
+			padding: 5px 5px 5px 15px;
+			max-height: none;
+		
+		}
+	
+	}
+	
+}
+select,
+input,
+textarea {
+	
+	-webkit-appearance: none;
+	appearance: none;
+	box-sizing: border-box;
+	width: 100%;
+	padding: 20px;
+	font-family: select( code );
+	
+}
+select {
+	
+	display: block;
+	background: #fff;
+	border: 1px solid color( background );
+	background: svg-process('<svg width="100%" height="100%" viewBox="0 0 1 1" version="1.1" xmlns="http://www.w3.org/2000/svg">',
+		'<path d="M .2 .3 L .5 .6 L .8 .3" stroke="#{color( bg )}" stroke-width=".1" fill="none" />',
+	'</svg>') no-repeat 90% 50% #fff;
+	background-size: auto 50%;
+	background-position: right size( gutter ) top 50%;
+	
+}
+input[type="button"]{
+	
+	@extend %input;
+	
+	background: #fff;
+	border: 1px solid #666;
+	width: auto;
+	text-transform: uppercase;
+	
+	&[value="remove"]{
+		
+		border: 1px solid #666;
+		color: red;
+		
+	}
+	
+	&[disabled]{
+		
+		opacity: .25;
+		cursor: not-allowed; 
+		
+	}
+	
+}
+label,
+[type="array"],
+[type="object"] {
+	
+	display: block;
+	width: 100%;
+	
+}
+
+article, header, footer {
+	
+	background: #fff;
+	padding: size( gutter );
+	
+}
+header, footer {
+	
+	color: #fff;
+	background: color( bg-secondary );
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-size: .75em;
+	
+}
+article {
+	
+	overflow: auto;
+	
+}
+h1 {
+	
+	font-family: font( header );
+	font-size: 1.6em;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	
+}
+main {
+	
+	margin: 0px auto;
+	height: 100%;
+	max-width: size( maxwidth );
+	display: grid;
+	grid-template-rows: auto 1fr auto;
+	
+	&:before, &:after {
+		
+		content: '';
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%,-50%);
+		width: 100%;
+		height: 100%;
+		background: rgba( #000, .7 );
+		pointer-events: none;
+		transition: opacity .4s, tranform 1s;
+		opacity: 0;
+		
+	}
+	
+	&:after {
+		
+		content: attr( data-message );
+		background: #fff;
+		width: auto;
+		height: auto;
+		padding: 20px;
+		padding-left: 60px;
+		color: #000;
+		transform: translate(-50%,-0%);
+		
+		background: svg-process('<svg width="100%" height="100%" viewBox="0 0 1 1" version="1.1" xmlns="http://www.w3.org/2000/svg">',
+			'<style type="text/css">',
+				'@keyframes rotate {',
+					'from { transform: rotateZ(0deg); }',
+					'to { transform: rotateZ(360deg); }',
+				'}',
+				'#group {',
+					'animation: rotate 2s linear infinite;',
+					'transform-origin: 50% 50%;',
+				'}',
+			'</style>',
+			'<g id="group">',
+				'<circle cx=".5" cy=".5" r=".3" stroke="#{color( bg )}" stroke-width=".2" fill="none" />',
+				'<circle cx=".5" cy=".2" r=".075" fill="#{color( primary )}" stroke="width" />',
+			'</g>',
+		'</svg>') no-repeat 20px 50% #fff;
+		background-size: 20px auto;
+		background-size: left 20px top 50%;
+		
+	}
+	
+	&[data-message]{ &:after, &:before {
+		
+		opacity: 1;
+		
+	}}
+	
+	&.state {
+		
+		&--success:after {
+			
+			background-image: svg-process('<svg width="100%" height="100%" viewBox="0 0 1 1" version="1.1" xmlns="http://www.w3.org/2000/svg">',
+				'<g id="group">',
+					'<path d="M .2 .5 L .5 .8 L .8 .2" stroke="#{color( bg )}" stroke-width=".2" fill="none" />',
+				'</g>',
+			'</svg>');
+			
+		}
+		
+	}
+	
+}
+
+.tabs,
+.items {
+	
+	display: flex;
+	overflow: hidden;
+	border-radius: 5px;
+	background: color( bg );
+	font-size: .7em;
+	list-style: none;
+	
+	li {
+		
+		flex: 1 1 auto;
+		text-align: center;
+			
+		&:first-child a {
+			
+			border-left: 2px solid #fff;
+			
+		}
+		
+	}
+	
+	a {
+		
+		display: block;
+		padding: 1em 2em;
+		box-sizing: border-box;
+		border: 2px solid #fff;
+		border-left: none;
+		color: #fff;
+		text-transform: uppercase;
+		text-decoration: none;
+		
+		&.active {
+			
+			background: color( primary );
+			color: #000;
+		
+		}
+		
+	}
+		
+}
+.tab {
+	
+	display: none;
+	
+	&.active {
+		
+		display: block;
+		
+	}
+	
+}
+.files {
+	
+	display: none;
+	flex-wrap: wrap;
+	align-content: stretch;
+	justify-content: flex-start;
+	
+	&.active {
+		
+		display: flex;
+		
+	}
+	
+	> li {
+		
+		flex: 0 1 150px;
+		width: 150px;
+		height: 150px;
+		margin: size( gutter ) / 2;
+		padding: 0;
+		position: relative;
+		
+	}
+	
+	a {
+		
+		transform: scale(1);
+		transition: transform .4s, background .4s, color .2s;
+		
+	}
+	
+	a.file {
+		
+		position: relative;
+		padding: size( gutter );
+		box-sizing: border-box;
+		text-decoration: none;
+		color: #000;
+		overflow: hidden;
+		
+		&, &:after {
+			
+			display: block;
+			width: 100%;
+			height: 100%;
+			z-index: 1;
+			background: #ececec;
+			
+		}
+		
+		&:after {
+			
+			position: absolute;
+			left: 0;
+			top: 0;
+			z-index: -1;
+			content: '';
+			background: linear-gradient( 35deg, color( primary ), color( secondary ) );
+			opacity: 0;
+			transition: opacity .4s;
+			
+		}
+		
+	}
+	
+	span {
+		
+		display: block;
+		font-size: .8em;
+		text-transform: uppercase;
+		
+		background: SVG-Pixel( rgba(#fff, .2) ) no-repeat 0 100%;
+		background-size: 0 75%;
+		
+		&:after { content: '/'; }
+		
+		&.file-name {
+			
+			font-size: 1em;
+			font-weight: bold;
+			text-transform: none;
+			
+			&:after { content: none; }
+			
+		}
+		
+		@for $i from 1 through 10 {
+			
+			&:nth-child(10n-#{10-$i}){
+				
+				padding-left: 1em * ($i - 1);
+				background-size: (1em * ($i - 1) - .2em) 75%;
+			
+			}
+			
+		}
+		
+	}
+	
+	ul {
+		
+		position: absolute;
+		bottom: 20px;
+		left: 50%;
+		display: block;
+		text-align: center;
+		z-index: 2;
+		font-size: 0;
+		box-sizing: border-box;
+		transform: translateX(-50%);
+		width: 100%;
+		
+		li {
+			
+			display: inline-block;
+			margin: 5px;
+			font-size: .5rem;
+			
+			a {
+				
+				display: block;
+				width: 3em;
+				height: 3em;
+				background: #fff;
+				box-sizing: border-box;
+				padding: 1em;
+				text-decoration: none;
+				color: #000;
+				
+			}
+			
+		}
+		
+	}
+	
+	> li:hover {
+	
+		a {
+		
+			transform: scale( 1.1 );
+			
+			&.file {
+		
+				background: transparent;
+				color: #fff;
+		
+			}
+			
+			&:after {
+				
+				opacity: 1;
+				
+			}
+		
+		}
+		
+	}
+	
+}
+.message {
+	
+	@keyframes out {
+		from { transform: translateY(0); opacity: 1; }
+		to { transform: translateY(-100%); opacity: 0; }
+	}
+	
+	position: fixed;
+	top: 0;
+	left: 0;
+	padding: 1em;
+	width: 100%;
+	box-sizing: border-box;
+	background: color( secondary );
+	color: #fff;
+	font-size: .8em;
+	z-index: 100;
+	animation: out .4s 10s;
+	font-weight: bold;
+	
+	&.out {
+		
+		animation-delay: 0s !important;
+		
+	}
+	
+}
+.popover {
+	
+	position: fixed;
+	top: 0;
+	left: 0;
+	display: flex;
+	z-index: 150;
+	background: rgba( color( bg ), .5 );
+	width: 100%;
+	height: 100%;
+	
+	> div {
+		
+		padding: size( gutter );
+		background: #fff;
+		overflow: auto;
+		margin: auto;
+		color: #000;
+		min-width: 200px;
+		box-sizing: border-box;
+		
+	}
+	
+}

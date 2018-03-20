@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+	
+	<meta charset="utf-8" />
+	<title>Content Editor Overview</title>
+	
+	<link rel="stylesheet" href="/css" type="text/css" />
+	
+</head>
+<body>
+
+{% import './macros/messages.njks' as messages %}
+{{ messages.render( info.messages ) }}
+	
+<main>
+	{% import './macros/header.njks' as header %}
+	{{ header.render( 'Home' ) }}
+	<article>
+		
+		<ul class="tab files" id="edit">
+		{% for file in allFiles %}
+			<li>
+				<a href="/{{file}}" class="file">{{file | replace( info.out, '' ) | replace( '.json', '' ) }}</a>
+				<ul>
+					<li><a href="/{{file}}" class="file-edit">E</a></li>
+					<li><a href="/delete/{{file}}" class="file-delete">D</a></li>
+					<li><a href="/{{file}}" class="file-move">M</a></li>
+				</ul>
+			</li>
+		{% endfor %}
+		</ul>
+		
+		<ul class="tab files" id="new">
+		{% for template in allTemplates %}
+			<li>
+				<a href="/{{template}}" class="file">{{template | replace( info.templates, '' ) | replace( '.json', '' )}}</a>
+			</li>
+		{% endfor %}
+		</ul>
+		
+	</article>
+	{% import './macros/footer.njks' as footer %}
+	{{ footer.render() }}
+</main>
+
+<script type="text/javascript" src="/script"></script>
+<script type="text/javascript">
+
+var moveToPaths = {};
+{% for key, value in info.paths %}
+moveToPaths['{{key}}'] = '{{value}}';
+{% endfor %}
+
+makeTabs();
+makeFiles();
+makeMessages();
+
+history.pushState({}, 'Home', '/' );
+
+</script>
+
+</body>
+</html>

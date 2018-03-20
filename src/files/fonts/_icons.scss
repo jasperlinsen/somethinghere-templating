@@ -1,0 +1,28 @@
+$icons-listing: ( 
+	logo: "\EA01",
+	placeholder: "\EA02"
+);
+
+@debug 'Be sure to also @import "[PATH]/icons.css" to make use of this font.';
+
+@mixin icons( $name ){
+
+	$i: map-get( $icons-listing, $name );
+	
+	@if $i == null {
+		
+		$i: map-get( $icons-listing, 'unknown' );
+	
+	}
+	
+	@if $i != null {
+		
+		content: $i;
+		font-family: 'icons';
+		color: inherit;
+	
+	}
+
+};
+
+			

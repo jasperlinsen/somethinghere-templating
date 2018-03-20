@@ -1,0 +1,7 @@
+{% macro render( messages ) %}
+
+{% for message in messages %}
+<aside class="message">{{message}}</aside>
+{% endfor %}
+
+{% endmacro %}

@@ -1,0 +1,8 @@
+{% macro render( elements = [] ) %}
+<footer>
+	{% for element in elements %}
+	{{ element | safe }}
+	{% endfor %}
+	<p>&copy; 2018 Something Here.</p>
+</footer>
+{% endmacro %}
