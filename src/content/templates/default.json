@@ -1,23 +1,22 @@
 {
 	"meta":{
-		"in":"./src/content/templates/default.njks",
+		"in":"./src/content/nunjucks/default.njks",
 		"out":"",
 		"predefined":{
-			"sections": {
-				"type":"",
-				"title":"My Title",
-				"content":"My Content"
+			"content": {
+				"title":"A title",
+				"content": "A 'content'",
+				"list": []
 			},
-			"sections.content":"wysiwyg",
-			"sections.type":{
-				"header":"header",
-				"section":"section",
-				"footer":"footer"
+			"content.list":{
+				"title":"A Link",
+				"link": "#"
 			}
 		}
 	},
 	"data":{
-		"title":"My Title",
-		"sections":[]
+		"title":"A default Title",
+		"subtitle":"A default subtitle",
+		"content": []
 	}
 }

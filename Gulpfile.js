@@ -224,9 +224,6 @@ function gulp_editorServer(){
 	}
 	function edit( templateIndex, jsonIndex, res ){
 		
-		// Merge the existing data with the template object.
-		// This will ensure that if an object changed template, it will update where necessary (if keys are not available they will be filled by the template).
-		
 		let info = Object.assign( {}, settings.EDITOR, {
 			paths: paths.content.in.reduce(( o, path ) => {
 			
@@ -239,18 +236,39 @@ function gulp_editorServer(){
 		
 		let json = allTemplates[ templateIndex ] || allFiles[ jsonIndex ]
 			json = JSON.parse( fs.readFileSync( json ).toString() );
+		
+		// Set the `in` to the template JSON file.
+		
+		json.meta.in = json.meta.in.replace( '.njks', '.json' );
+		
+		let template = JSON.parse( fs.readFileSync( json.meta.in ).toString() );
+		
+		// Create some predefined things like templates to select.
+		// Hide the self value and the predefined value in the editor.
+				
+		json.meta.predefined = json.meta.predefined || {};
+		json.meta.predefined[ '.meta.predefined' ] = null;
+		json.meta.predefined[ '.meta.self' ] = null;
+		json.meta.predefined[ '.meta.in' ] = allTemplates.reduce((object, t) => {
 			
-		let template = json.meta.in.replace( '.njks', '.json' );
-			template = JSON.parse( fs.readFileSync( template ).toString() );
-		
-		Object.assign( template.data, json.data );
-		Object.assign( template.meta, json.meta );
-		
-		json = template;
+			object[ t.split( '/' ).pop().split( '.' )[ 0 ] ] = t;
+			
+			return object;
+			
+		}, {});
 		
 		json.meta.self = allFiles[ jsonIndex ] || '';
 		
-		json = JSON.stringify( json );
+		
+		// Merge the existing data with the template object.
+		// This will ensure that if an object changed template, it will update where necessary (if keys are not available they will be filled by the template).
+		// No data will be lost when changing templates.
+		
+		Object.assign( json.meta.predefined, template.meta.predefined );
+		Object.assign( template.data, json.data );
+		Object.assign( template.meta, json.meta );
+		
+		json = JSON.stringify( template );
 		
 		res.writeHead( 200, {'Content-Type': 'text/html'} );
 		res.write( nunjucks.render( src + 'templates/editor.njks', {
@@ -414,7 +432,9 @@ function gulp_editorServer(){
 			
 			if( typeof json.meta.self !== 'undefined' ){
 				
-				if( json.meta.self === '' ){
+				var filename = json.meta.self;
+				
+				if( filename === '' ){
 					
 					var id = 1;
 					var all = fs.readdirSync( out );
@@ -425,7 +445,7 @@ function gulp_editorServer(){
 					
 					}
 					
-					json.meta.self = out + 'untitled-' + id + '.json';
+					filename = out + 'untitled-' + id + '.json';
 					
 					status.message.push( 'File output path created: ' + json.meta.self );
 					status.stateIndex++;
@@ -437,7 +457,12 @@ function gulp_editorServer(){
 				
 				}
 				
-				fs.writeFile( json.meta.self, JSON.stringify( json ), ( err, success ) => {
+				// These were there to make the editor do its thing.
+				// Remove when saving file.
+				delete json.meta.predefined;
+				delete json.meta.self;
+				
+				fs.writeFile( filename, JSON.stringify( json ), ( err, success ) => {
 					
 					if( err ){
 						
@@ -446,9 +471,9 @@ function gulp_editorServer(){
 						
 					} else {
 						
-						status.file = json.meta.self; 
+						status.file = filename; 
 						status.state = true;
-						status.message.push( 'File saved at ' + json.meta.self );
+						status.message.push( 'File saved at ' + filename );
 						status.stateIndex++;
 						return end();
 						
@@ -590,8 +615,11 @@ function gulp_task_content( IN = paths.content.in, OUT = paths.content.out ){
 				}
 			
 				nunjucks.configure({ noCache: true });
-
-				var output = nunjucks.render( meta.in, data );
+				
+				var template = JSON.parse( fs.readFileSync( meta.in ) );
+				var njksPath = template.meta.in;
+				
+				var output = nunjucks.render( njksPath, data );
 				var filePath = meta.out.slice( -1 ) == '/'
 					? out + meta.out + 'index.html'
 					: out + meta.out;

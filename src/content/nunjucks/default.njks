@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+	
+	<meta charset="utf-8" />
+	
+	<title>Welcome to Something Here Templating</title>
+	
+</head>
+<body>
+
+<h1>{{title}}</h1>
+<h2>{{subtitle}}</h2>
+
+{% for item in content %}
+<section>
+	
+	<h3>{{item.title}}</h3>
+	<p>{{item.content}}</p>
+	
+	<ul>
+		{% for listitem in item.list %}
+		<li><a href="{{listitem.link}}">{{listitem.title}}</a></lu>
+		{% endfor %}
+	</ul>
+	
+</section>
+<hr />
+{% endfor %}
+
+</body>
+</html>

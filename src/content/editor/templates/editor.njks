@@ -307,7 +307,7 @@ function make_json_editor( data, parent, path = '' ){
 	
 	var predefined = json.meta.predefined[ path.replace( '.data.', '' ).replace( /\[[0-9]\]/gi, '[]' ) ];
 	
-	if( predefined === null ) return null;
+	if( predefined === null || data === null ) return null;
 	
 	if( typeof data === 'string' ){
 		
@@ -342,8 +342,6 @@ function make_json_editor( data, parent, path = '' ){
 }
 function make_json_editor_init( data, parent ){
 	
-	predefinitions( data );
-	
 	json = data;
 	parent.innerHTML = '';
 	
@@ -368,23 +366,6 @@ function make_json_editor_init( data, parent ){
 	parent.appendChild( _meta );
 	
 	makeTabs();
-	
-}
-
-function predefinitions( data ){
-	
-	// These are predefined changeable value, like template choice or path out selection (?)
-	// They are passed into the template.
-	// Be aware that changing this will 
-	
-	data.meta.predefined[ '.meta.in' ] = {
-		'None':''
-		{% for template in allTemplates %}
-		,'{{ template | replace( info.templates, '' ) | replace( '.json', '' ) }}': '{{template | replace('.json', '.njks' )}}'
-		{% endfor %}
-	};
-	data.meta.predefined[ '.meta.predefined' ] = null;
-	data.meta.predefined[ '.meta.self' ] = null;
 	
 }
 

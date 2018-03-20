@@ -1,1 +1,20 @@
-{"meta":{"in":"./src/content/templates/default.njks","out":"./","predefined":{"sections":{"type":"","title":"My Title","content":"My Content"},"sections.content":"wysiwyg","sections.type":{"header":"header","section":"section","footer":"footer"},".meta.in":{"None":"","default":"./src/content/templates/default.njks"},".meta.predefined":null,".meta.self":null},"self":"./src/content/data/index.json"},"data":{"title":"My Title","sections":[{"type":"section","title":"My Section Title","content":"My Footer Title"},{"type":"header","title":"My Title HEader","content":"My Content"}]}}
+{
+	"meta":{
+		"in":"./src/content/templates/default.json",
+		"out":"./"
+	},
+	"data":{
+		"title":"Welcome!",
+		"subtitle":"Something Here Templating",
+		"content": [
+			{
+				"title":"Getting Started",
+				"content":"Have a look at the following resources:",
+				"list":[
+					{ "title": "./README.md", "link": "#"},
+					{ "title": "./src/content/templates/editor/README.md", "link": "#"}
+				]
+			}
+		]
+	}
+}
