@@ -1,0 +1,362 @@
+@import 'compass/reset';
+@import 'core.svg.processor';
+/*
+@import '../files/fonts/_icons.scss';
+@import url( '../fonts/icons.css' );
+*/
+@import url('https://fonts.googleapis.com/css?family=Open+Sans:100,300,400,600|Vampiro+One|Space+Mono');
+
+// @f  Function Definitions
+@function SVG-Pixel( $color: #fff ){
+
+	@return svg-process('<svg width="100%" height="100%" viewBox="0 0 1 1" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" preserveAspectRatio="none">',
+		'<rect x="0" y="0" width="1" height="1" fill="#{$color}" stroke="none" />',
+	'</svg>');
+
+}
+@function SVG-ArrowDown( $color: #fff ){
+
+	@return svg-process('<svg width="100%" height="100%" viewBox="0 0 1 1" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">',
+		'<path d="M .2 .35 L .5 .65 L .8 .35" stroke="#{$color}" stroke-width=".05" />',
+	'</svg>');
+
+}
+@function SVG-Projects( $color: #fff ){
+
+	@return svg-process('<svg width="100%" height="100%" viewBox="0 0 1 1" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">',
+		'<path d="M .4 .35 h .2 v .3 h -.2 z" fill="none" stroke="#{$color}" stroke-width=".03" />',
+		'<path d="M .4 .43 L .3 .4 v .2 L .4 .57" fill="none" stroke="#{$color}" stroke-width=".025" />',
+		'<path d="M .3 .45 L .22 .4 v .2 L .3 .55" fill="none" stroke="#{$color}" stroke-width=".025" />',
+		'<path d="M .6 .45 L .7 .4 v .2 L .6 .57" fill="none" stroke="#{$color}" stroke-width=".02" />',
+		'<path d="M .7 .45 L .78 .4 v .2 L .7 .55" fill="none" stroke="#{$color}" stroke-width=".02" />',
+	'</svg>');
+
+}
+@function SVG-Desktop( $color: #fff ){
+
+	@return svg-process('<svg width="100%" height="100%" viewBox="0 0 100 100" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">',
+		'<g transform="matrix(1,0,0,1,-1.43984,0.694531)">',
+			'<rect x="11.527" y="11.307" width="80.113" height="51.549"  stroke-width="4" stroke="#{$color}" fill="none"/>',
+		'</g>',
+		'<g transform="matrix(1,0,0,1,-2.08203,0.15625)">',
+			'<rect x="33.094" y="86.669" width="38.017" height="5.67" stroke-width="4" stroke="#{$color}" fill="none"/>',
+		'</g>',
+		'<g transform="matrix(1,0,0,1,1.74272,20.6245)">',
+			'<path d="M33.844,43.05L33.844,66.112" stroke-width="4" stroke="#{$color}" fill="none"/>',
+		'</g>',
+		'<g transform="matrix(1,0,0,1,30.96,20.6245)">',
+			'<path d="M33.844,43.05L33.844,66.112" stroke-width="4" stroke="#{$color}" fill="none"/>',
+		'</g>',
+	'</svg>');
+
+	
+}
+@function SVG-Mobile( $color: #fff ){
+
+	@return svg-process('<svg width="100%" height="100%" viewBox="0 0 104 104" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">',
+		'<g transform="matrix(1,0,0,1,-111.643,2)">',
+			'<g transform="matrix(1,0,0,1,-1,-2)">',
+				'<rect x="144.742" y="10.926" width="39.181" height="82.274" stroke-width="4" stroke="#{$color}" fill="none"/>',
+			'</g>',
+			'<g transform="matrix(1,0,0,1,-1,-2)">',
+				'<path d="M145.415,83.211L184.083,83.211" stroke-width="4" stroke="#{$color}" fill="none"/>',
+			'</g>',
+		'</g>',
+	'</svg>');
+
+	
+}
+@function SVG-Facebook( $color: #fff ){
+
+	@return svg-process('<svg width="100%" height="100%" viewBox="0 0 99 98" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">',
+		'<g transform="matrix(1,0,0,1,-28,-44)">',
+			'<g transform="matrix(1,0,0,1,27.8386,42.8698)">',
+				'<path d="M49.743,1.423C76.475,1.423 98.178,23.126 98.178,49.858C98.178,76.59 76.475,98.293 49.743,98.293C23.01,98.293 1.307,76.59 1.307,49.858C1.307,23.126 23.01,1.423 49.743,1.423ZM40.617,53.69L40.617,80.736L51.502,80.736L51.502,53.689L60.58,53.689L61.939,43.149L51.502,43.149L51.502,36.419C51.502,33.367 52.349,31.288 56.726,31.288L62.307,31.285L62.307,21.858C61.342,21.73 58.028,21.443 54.174,21.443C48.014,21.443 43.341,24.321 41.488,29.716C40.92,31.37 40.617,33.26 40.617,35.376L40.617,43.149L31.515,43.149L31.515,53.69L40.617,53.69Z" fill="#{$color}"/>',
+			'</g>',
+		'</g>',
+	'</svg>');
+
+}
+@function SVG-Twitter( $color: #fff ){
+
+	@return svg-process('<svg width="100%" height="100%" viewBox="0 0 98 98" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">',
+		'<g transform="matrix(1,0,0,1,-138,-44)">',
+			'<g transform="matrix(1,0,0,1,27.8386,42.8698)">',
+				'<path d="M159.33,1.423C186.062,1.423 207.765,23.126 207.765,49.858C207.765,76.59 186.062,98.293 159.33,98.293C132.597,98.293 110.894,76.59 110.894,49.858C110.894,23.126 132.597,1.423 159.33,1.423ZM174.35,24.625L171.228,24.625L171.228,24.637C171.228,24.649 170.968,24.695 170.447,24.775C169.927,24.855 169.287,25.025 168.526,25.285C167.766,25.545 166.935,25.926 166.035,26.426C165.134,26.926 164.334,27.497 163.633,28.137C162.933,28.777 162.362,29.398 161.922,29.998C161.482,30.598 161.126,31.133 160.853,31.601C160.585,32.073 160.311,32.7 160.031,33.48C159.751,34.261 159.541,35.031 159.401,35.792C159.261,36.552 159.19,37.383 159.19,38.283C159.19,39.184 159.231,39.884 159.311,40.384L159.431,41.135L159.449,41.225L159.461,41.315L159.04,41.303C158.76,41.291 158.24,41.245 157.479,41.165C156.719,41.085 155.588,40.905 154.087,40.625C152.586,40.344 151.526,40.114 150.905,39.934C150.285,39.754 149.204,39.374 147.663,38.793C146.122,38.213 144.682,37.563 143.341,36.842C142,36.122 140.779,35.391 139.678,34.651C138.578,33.911 137.687,33.26 137.007,32.7C136.326,32.139 135.926,31.785 135.806,31.637C135.686,31.485 135.586,31.393 135.506,31.361C135.426,31.333 135.016,30.949 134.275,30.208C133.535,29.468 132.894,28.797 132.354,28.197L131.543,27.296L131.532,27.278L131.513,27.266L131.453,27.146L131.435,27.134L131.411,27.098L131.375,27.074L131.351,27.038L131.333,27.026L131.315,27.038L131.303,27.056L131.291,27.074L131.273,27.086L131.213,27.266L130.703,28.407C130.363,29.168 130.103,29.888 129.922,30.568C129.742,31.249 129.622,31.859 129.562,32.4C129.502,32.94 129.482,33.59 129.502,34.351C129.522,35.111 129.612,35.882 129.772,36.662C129.933,37.443 130.167,38.217 130.475,38.986C130.787,39.758 131.083,40.394 131.363,40.895C131.642,41.392 131.963,41.864 132.324,42.306C132.684,42.746 133.044,43.166 133.405,43.566C133.765,43.967 134.109,44.293 134.437,44.545C134.77,44.793 134.942,44.921 134.954,44.929L134.966,44.947L135.086,45.007L135.098,45.025L135.134,45.049L135.146,45.067L135.266,45.127L135.278,45.145L135.314,45.169L135.338,45.205L135.374,45.229L135.386,45.247L134.846,45.247L134.575,45.217C134.395,45.197 133.845,45.087 132.924,44.887C132.004,44.687 131.233,44.447 130.613,44.167L129.682,43.747L129.442,43.626L129.382,43.608L129.322,43.596L129.43,44.857C129.499,45.699 129.643,46.533 129.862,47.349C130.083,48.169 130.413,49.03 130.853,49.93C131.293,50.831 131.794,51.621 132.354,52.302C132.914,52.982 133.429,53.539 133.897,53.971C134.367,54.397 134.864,54.792 135.386,55.154C135.906,55.514 136.607,55.884 137.487,56.264C138.368,56.644 138.908,56.865 139.108,56.925C139.308,56.985 139.448,57.025 139.528,57.045L140.129,57.195L140.117,57.213L140.099,57.225L140.081,57.237L140.069,57.255L139.919,57.285L139.769,57.315L139.648,57.345C139.568,57.365 139.348,57.405 138.988,57.465C138.628,57.525 137.977,57.565 137.037,57.585C136.096,57.605 135.406,57.585 134.966,57.525L134.305,57.435L134.215,57.417L134.125,57.405L134.137,57.465L134.155,57.525L134.215,57.705L134.713,58.798C135.042,59.53 135.386,60.177 135.746,60.737C136.106,61.297 136.531,61.844 137.019,62.376C137.511,62.904 137.911,63.312 138.22,63.601C138.532,63.893 139.038,64.259 139.739,64.699C140.439,65.14 141.159,65.52 141.9,65.84C142.64,66.16 143.331,66.4 143.971,66.561C144.612,66.721 145.082,66.811 145.382,66.831C145.682,66.851 145.992,66.871 146.313,66.891L146.793,66.921L146.781,66.939L146.763,66.951L146.745,67.011L146.733,67.071L146.673,67.083L146.613,67.101L146.601,67.119L146.583,67.131L146.565,67.143L146.553,67.161L146.541,67.179L146.523,67.191L146.505,67.203L146.493,67.221L145.112,68.152C144.191,68.772 143.507,69.196 143.059,69.424C142.606,69.656 141.846,70.009 140.777,70.481C139.705,70.949 138.528,71.353 137.247,71.694C135.966,72.034 134.856,72.274 133.915,72.414C132.974,72.554 132.054,72.644 131.153,72.684C130.253,72.724 129.402,72.724 128.602,72.684C127.801,72.644 127.311,72.614 127.131,72.594L126.861,72.564L126.801,72.546L126.741,72.534L126.741,72.654L126.771,72.654L126.789,72.666L126.813,72.702L126.849,72.726L126.861,72.744L126.981,72.804L126.993,72.822L127.029,72.846L127.041,72.864L127.581,73.195C127.941,73.415 128.265,73.599 128.554,73.747C128.846,73.899 129.566,74.259 130.715,74.828C131.868,75.4 133.255,75.966 134.876,76.527C136.497,77.087 137.717,77.467 138.538,77.667C139.358,77.867 140.489,78.068 141.93,78.268C143.371,78.468 144.201,78.578 144.421,78.598C144.642,78.618 144.922,78.638 145.262,78.658L145.772,78.688L145.772,78.718L149.675,78.718L149.675,78.688L151.806,78.478C153.227,78.338 154.498,78.168 155.618,77.968C156.739,77.767 157.9,77.487 159.1,77.127C160.301,76.767 161.442,76.377 162.523,75.956C163.603,75.536 164.608,75.08 165.536,74.587C166.469,74.099 167.265,73.665 167.926,73.285C168.586,72.904 169.311,72.43 170.099,71.862C170.892,71.289 171.632,70.717 172.321,70.145C173.013,69.576 173.405,69.248 173.497,69.16C173.585,69.068 174.106,68.548 175.058,67.599C176.007,66.647 176.791,65.79 177.412,65.03C178.032,64.269 178.642,63.459 179.243,62.598C179.843,61.738 180.504,60.687 181.224,59.446C181.944,58.205 182.635,56.805 183.295,55.244C183.956,53.683 184.516,52.082 184.976,50.441C185.437,48.8 185.777,47.329 185.997,46.028C186.217,44.727 186.367,43.516 186.447,42.396C186.527,41.275 186.573,40.27 186.585,39.382C186.593,38.489 186.974,37.737 187.726,37.124C188.475,36.516 189.239,35.822 190.019,35.041C190.8,34.261 191.224,33.814 191.292,33.702C191.364,33.594 191.42,33.534 191.46,33.522C191.5,33.514 191.771,33.174 192.271,32.502C192.771,31.833 193.025,31.493 193.033,31.481L193.051,31.469L193.081,31.409L193.111,31.349L193.129,31.337L193.141,31.319L193.153,31.301L193.171,31.289L193.189,31.277L193.201,31.259L193.213,31.241L193.231,31.229L193.249,31.217L193.261,31.199L193.291,31.181L193.321,31.169L193.321,31.049L193.201,31.061L193.081,31.079L192.961,31.139L192.901,31.169L192.841,31.199L192.751,31.229L192.571,31.289L190.95,31.829C189.929,32.169 188.859,32.46 187.738,32.7L186.057,33.06L185.757,33.06L185.769,33.042L185.787,33.03L185.805,33.018L185.817,33L185.829,32.982L185.847,32.97L185.865,32.958L185.877,32.94L185.937,32.91L185.997,32.88L186.009,32.862L186.027,32.85L186.045,32.838L186.057,32.82L186.117,32.79L186.177,32.76L186.477,32.562C186.677,32.434 186.847,32.293 186.988,32.141C187.128,31.993 187.414,31.733 187.846,31.361C188.274,30.993 188.759,30.448 189.299,29.728C189.839,29.007 190.29,28.297 190.65,27.597C191.01,26.896 191.2,26.496 191.22,26.396C191.24,26.296 191.26,26.216 191.28,26.156L191.31,26.066L191.34,26.006L191.37,25.946L191.4,25.856L191.43,25.765L191.448,25.675L191.46,25.585L191.4,25.597L191.34,25.615L191.328,25.633L191.31,25.645L191.292,25.657L191.28,25.675L191.16,25.735L191.1,25.765L191.04,25.796L191.028,25.814C191.016,25.822 190.916,25.882 190.728,25.994C190.536,26.102 189.999,26.356 189.119,26.756C188.238,27.156 187.348,27.517 186.447,27.837C185.547,28.157 184.706,28.407 183.926,28.587C183.145,28.767 182.571,28.671 182.203,28.299C181.83,27.931 181.41,27.583 180.942,27.254C180.47,26.922 179.943,26.596 179.363,26.276C178.783,25.956 178.182,25.675 177.562,25.435C176.941,25.195 176.251,25.001 175.49,24.853L174.35,24.625Z" fill="#{$color}"/>',
+			'</g>',
+		'</g>',
+	'</svg>');
+	
+}
+@function SVG-LinkedIn( $color: #fff ){
+		
+	@return svg-process('<svg width="100%" height="100%" viewBox="0 0 97 98" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve">',
+		'<g transform="matrix(1,0,0,1,-579,-44)">',
+			'<path d="M627.427,44.292C654.16,44.292 675.863,65.995 675.863,92.728C675.863,119.46 654.16,141.163 627.427,141.163C600.695,141.163 578.992,119.46 578.992,92.728C578.992,65.995 600.695,44.292 627.427,44.292ZM651.602,116.134L651.602,97.3C651.602,87.211 646.215,82.516 639.029,82.516C633.229,82.516 630.637,85.709 629.186,87.944L629.186,88.05L629.115,88.05C629.136,88.016 629.164,87.978 629.186,87.944L629.186,83.288L618.265,83.288C618.412,86.371 618.265,116.134 618.265,116.134L629.188,116.134L629.188,97.79C629.188,96.808 629.262,95.83 629.55,95.128C630.34,93.164 632.135,91.134 635.152,91.134C639.104,91.134 640.684,94.147 640.684,98.561L640.684,116.134L651.602,116.134ZM612.226,83.288L601.308,83.288L601.308,116.134L612.226,116.134L612.226,83.288ZM606.84,67.454C603.103,67.454 600.659,69.905 600.659,73.128C600.659,76.281 603.032,78.806 606.695,78.806L606.768,78.806C610.577,78.806 612.945,76.282 612.945,73.128C612.874,69.905 610.577,67.454 606.84,67.454Z" fill="#{$color}"/>',
+		'</g>',
+	'</svg>');
+	
+}
+@function strip-unit( $number ){
+
+	@if type-of( $number ) == 'number' and not unitless( $number ){
+		
+		@return $number / ( $number * 0 + 1 );
+		
+	}
+
+	@return $number;
+	
+}
+@function coordinate-offset-in-radius( $x, $y, $r ){
+
+	@return ($x + (random() * 2 - 1) * $r) ($y + (random() * 2 - 1) * $r);
+
+}
+@function SVG-navigation-background( $color1: color( primary ), $color2: color( bg ) ){
+	
+	$tl: coordinate-offset-in-radius( .5, .5, .5 );
+	$tr: coordinate-offset-in-radius( 19.5, .5, .5 );
+	$br: coordinate-offset-in-radius( 19.5, 9.5, .5 );
+	$bl: coordinate-offset-in-radius( .5, 9.5, .5 );
+
+	$bg: "M #{$tl} L #{$tr} L #{$br} L #{$bl} Z";
+
+	$tl: coordinate-offset-in-radius( 1.5, 1.5, .4 );
+	$tr: coordinate-offset-in-radius( 18.5, 1.5, .4 );
+	$br: coordinate-offset-in-radius( 18.5, 8.5, .4 );
+	$bl: coordinate-offset-in-radius( 1.5, 8.5, .4 );
+
+	$fg: "M #{$tl} L #{$tr} L #{$br} L #{$bl} Z";
+
+	@return svg-process('<svg width="100%" height="100%" viewBox="0 0 20 10" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="none">',
+		'<path d="#{$bg}" fill="#{$color1}" stroke="none" />',
+		'<path d="#{$fg}" fill="#{$color2}" stroke="none" />',
+	'</svg>');
+	
+}
+@function map-get-safe( $map, $name ){
+	
+	$getter: map-get( $map, $name );
+	
+	@if $getter == nul {
+		
+		@return map-get( $map, default );
+	
+	} @else {
+		
+		@return $getter;
+		
+	}
+	
+}
+
+// $   Variables Definitions
+
+// $px Sizes
+
+$sizes: (
+	gutter: 20px,
+	breakpoint: 800px,
+	maxwidth: 800px,
+	padding: 100px
+);
+
+@function size( $name ){ @return map-get-safe( $sizes, $name ); }
+
+// $#  Colors
+
+$colors: (
+	primary: cyan,
+	secondary: magenta,
+	bg: #282625,
+	bg-secondary: rgba( cyan, .1 ),
+	default: yellow
+);
+
+@function color( $name ){ @return map-get-safe( $colors, $name ); }
+
+// $f  Fonts
+
+$fonts: (
+	header: ('Vampiro One', 'Arial', sans-serif),
+	body: ('Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif),
+	code: ('Space Mono', 'Monaco', 'Courier New', 'Courier', monospace),
+	default: sans-serif
+);
+
+@function font( $name ){ @return map-get-safe( $fonts, $name ); }
+
+// $t  Timing Functions
+
+$timing-functions: (
+	bounce: cubic-bezier(.19,1.32,.87,1.22),
+	default: linear
+);
+
+@function timing-function( $name ){ @return map-get-safe( $timing-functions, $name ); }
+
+// %   Extendables Definitions
+%content-flow-box {
+
+	margin-bottom: size( gutter );
+	
+	&:last-child {
+		
+		margin-bottom: 0;
+		
+	}
+	
+}
+%input {
+	
+	appearance: none;
+	padding: .7em 2em;
+	border-radius: 3em;
+	overflow: hidden;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 100%;
+	background: #fff;
+	color: #000;
+	box-sizing: border-box;
+	
+}
+%no-user-select {
+	
+	-webkit-tap-highlight-color: color( primary );
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;   
+	
+}
+%icon {
+
+	width: 1em;
+	height: 1em;
+	display: inline-block;
+	overflow: hidden;
+	color: transparent;
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	background-color: transparent;
+	background-size: contain;
+	margin: .25em;
+	vertical-align: middle;
+	transform: scale( 1 );
+	transition: transform .4s;
+	
+	&:hover, &:active {
+		
+		transform: scale( 1.1, 1.1 );
+		
+	}
+	
+}
+
+// @m  Mixin Definitions
+@mixin mobile( $orientation: nul ){
+	
+	@if $orientation != nul {
+	
+		@media all and (max-width:#{size( breakpoint )}) and (orientation:#{$orientation}){
+		
+			@content;
+		
+		}
+	
+	} @else {
+	
+		@media all and (max-width:#{size( breakpoint )}){
+		
+			@content;
+		
+		}
+	
+	}
+	
+}
+@mixin desktop( $orientation: nul ){
+	
+	@if $orientation != nul {
+	
+		@media all and (min-width:#{size( breakpoint ) + 1}) and (orientation:#{$orientation}){
+		
+			@content;
+		
+		}
+	
+	} @else {
+	
+		@media all and (min-width:#{size( breakpoint ) + 1}){
+		
+			@content;
+		
+		}
+	
+	}
+	
+}
+@mixin range( $property, $vw, $min, $max ){
+	
+	$vw: strip-unit( $vw );
+	$min: strip-unit( $min );
+	$max: strip-unit( $max );
+	
+	font-size: ($max - $min) / 2 + $min / 100 * 1px;
+	font-size: $vw * 1vw;
+	
+	@media all and (min-width:#{$max * 1px}){
+		
+		font-size: $vw * ($max / 100) * 1px;
+		
+	}
+	@media all and (max-width:#{$min * 1px}){
+		
+		font-size: $vw * ($min / 100) * 1px;
+		
+	}
+	
+}
+
+// @k  Keyframe Animations
+@keyframes rotate {
+	from { transform: rotateZ(0deg); }
+	to { transform: rotateZ(360deg); }
+}
+@keyframes exciting {
+	
+	0% { color: red; }
+	10% { color: blue; }
+	20% { color: yellow; }
+	30% { color: teal; }
+	40% { color: purple; }
+	50% { color: pink; }
+	60% { color: cyan; }
+	70% { color: orange; }
+	80% { color: gold; }
+	90% { color: silver; }
+	100% { color: red; }
+	
+}
+@keyframes svg-fill-stroke {
+	from { stroke-dasharray: 0 90; }
+	to { stroke-dasharray: 90 0; }
+}
+@keyframes svg-scale-end {
+	from { transform: scale( 1 ); }
+	90% { transform: scale( 1 ); opacity: 1; }
+	to { transform: scale( 1.5 ); opacity: 0; }
+}
+@keyframes svg-scale {
+	from { transform: scale( 0 ); }
+	90% { transform: scale( .9 ); opacity: 1; }
+	to { transform: scale( 1 ); opacity: 0; }
+}
+@keyframes background-shine-slide {
+	from { background-position: left -20vw top 0; }
+	50% { background-position: right -20vw top 0; }
+	to { background-position: right -20vw top 0; }
+}

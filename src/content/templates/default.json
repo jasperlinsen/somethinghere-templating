@@ -1,7 +1,6 @@
 {
 	"meta":{
 		"in":"./src/content/nunjucks/default.njks",
-		"out":"",
 		"predefined":{
 			"content": {
 				"title":"A title",

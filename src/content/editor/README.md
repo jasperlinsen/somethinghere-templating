@@ -30,17 +30,19 @@ The meta object contains data regarding the template itself.
 
 #### In
 
-**This value is also required for the DATA JSON.**
+**This value is required for the `data.json` and `template.json`.**
 
 The `in` String defines where the template is located from the root of the repository. You can define a different location for the actual files. This will point to a `nunjucks` file, which we give the extension `.njks`.
 
 #### Out
 
-**This value is also required for the DATA JSON.**
+**This value is only required for the `data.json`.**
 
 The `out` String defines where the template's compiled version will be output to. This string has no effect in the template's own JSON, but is important once we start building, so this will need to be filled in. It is empty in the template JSON.
 
 #### Predefined
+
+**This value is only required for the `template.json`.**
 
 This `object` will tell the editor how you would like to edit certain values. It allows you to define default objects that will be used when adding to an array. As an example, let's presume I want to make a list of items. In the data object it will be stored at `items`. I want it to have a `type`, `title` and `content`. `title` is just a text string, `content` is editable HTML using a WYSIWYG editor and `type` will be a dropdown list of available types (lets say `a`, `b` and `c`). Your template JSON file will look like this:
 	
@@ -75,6 +77,8 @@ The predefined object also has a couple of values filled in only when editing. W
 The editor also adds a list of templated to the predefined for the `.meta.in` value.
 
 ### Self
+
+**This value is only required for the `template.json`.**
 
 Self is used by the editor to store where the file is located, and it will save to this location when prompted. By default, this is hidden in the editor. When self is empty, clicking 'save' will prompt the user to enter a filename for the content, which will then be saved at `settings.EDITOR.out`.
 
