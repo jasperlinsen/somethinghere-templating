@@ -85,7 +85,8 @@ Templates are parsed using Nunjucks, and use a custom data file with the followi
 		meta: {
 			in: '[PATH/TO/TEMPLATE].njks',
 			out: '[PATH/TO/OUTPUT/FROM/content.out/]',
-			predefined: {}
+			predefined: {},
+			self: '[PATH/TO/JSON/FILE/myJSON.json]'
 		},
 		data: {}
 	}
@@ -96,7 +97,9 @@ This is because it allows every piece of content to be stored in its own JSON fi
 
 An `add` and `remove` button will be added by the editor, and clicking add will create a new instance of the predefined object.
 
-**Every template requires a `template.json` file as well, which is an empty version of the data structure. It needs to be placed right next to the template in the template directory. This is for the editor to be able to add new pages. The edtior does not really care where your templates are, it cares where the JSON files point to.**
+**Every template requires a `template.json` file as well, which is an empty version of the data structure. It needs to be placed right next to the template in the template directory. This is for the editor to be able to add new pages. The editor does not really care where your templates are, it cares where the JSON files point to.**
+
+The Editor _does_ care what `self` is pointing to, and if it is empty it will allow you to name a file that will be stored at `settings.EDITOR.out` when clicking save. In the editor, this property is hidden, as well as the `predefined` property.
 
 ### Files
 
@@ -144,6 +147,7 @@ and then navigate to it at `localhost:3003`.
 
 ### Editor Roadmap
 
+- Merge the template and data object more thoroughly so changing the template itself will also change the predefined values appropriately **or** remove the predefined from the data itself altogether so it is only defined in the templates' JSON file. This will mean some data that has changed will probably become impossible to edit if it does not match the template, though it would not lose any data. (Probably going for option #2).
 - Potentially include the editor default JSON in the `njks` file using a `{# json #}` header.
 - Make editing more comfortable (not just basic inputs).
 - Add the possibility to predefine the type of input to allow and use in `predefined`:
