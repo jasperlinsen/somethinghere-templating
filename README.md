@@ -1,4 +1,8 @@
-# Something Here
+# Something Here Templating
+
+For my sote (somethinghere.net) I have been working at making a standardised templating system using a combination of Nunjucks and my own node stuff. This includes a convenient template editor (allows you to edit and add data files), default SASS/Compass compiler, Javascript compiler and Nunjucks processor.
+
+__This document was last updated 20/03/2018. At this time I have not chosen a license yet, so this code is currently (C) Something Here 2018.__
 
 ## Install
 
@@ -71,7 +75,7 @@ __Example__ `[ './src/css/**/*.scss' ]`
 
 ### Scripts
 
-Scripts are transpiled with Babel with the preset `env`. They are also compressed in `--prd` mode.
+Scripts are combined with Browserify and transpiled with Babel with the preset `env`. They are also compressed in `--prd` mode.
 
 ### CSS
 
@@ -147,6 +151,7 @@ and then navigate to it at `localhost:3003`.
 
 ### Editor Roadmap
 
+- Add UNDO to delete (or move) commands. Delete currently moves the file to the `./.editor-tmp/` folder anyway so no files are lost at the moment (unless they had the same name).
 - Merge the template and data object more thoroughly so changing the template itself will also change the predefined values appropriately **or** remove the predefined from the data itself altogether so it is only defined in the templates' JSON file. This will mean some data that has changed will probably become impossible to edit if it does not match the template, though it would not lose any data. (Probably going for option #2).
 - Potentially include the editor default JSON in the `njks` file using a `{# json #}` header.
 - Make editing more comfortable (not just basic inputs).
