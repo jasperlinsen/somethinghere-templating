@@ -142,7 +142,7 @@ function gulp_saveServer(){
 			
 		}
 	
-	}).listen( settings.SAVE_SERVER_PORT );
+	}).listen( settings.SAVESERVER.port );
 
 }
 function gulp_syncServer(){
@@ -151,9 +151,9 @@ function gulp_syncServer(){
 	
 	browsersync.init({
 		server: {
-			baseDir: "./dist/",
-			ui: settings.SYNC_UI_SERVER_PORT,
-			port: settings.SYNC_SERVER_PORT
+			baseDir: settings.SYNCSERVER.root,
+			ui: settings.SYNCSERVER.uiport,
+			port: settings.SYNCSERVER.port
 		},
 		middleware: function( req, res, next ){
 			res.setHeader('Access-Control-Allow-Origin', '*');
@@ -165,12 +165,6 @@ function gulp_syncServer(){
 	
 }
 function gulp_editorServer(){
-	
-	var { port, tmp, src, templates, out } = settings.EDITOR;
-	var allTemplates = [];
-	var allFiles = [];
-	
-	nunjucks.configure({ noCache: true });
 					
 	function css(){
 		
@@ -491,6 +485,12 @@ function gulp_editorServer(){
 		});
 		
 	}
+	
+	var { port, tmp, src, templates, out } = settings.EDITOR;
+	var allTemplates = [];
+	var allFiles = [];
+	
+	nunjucks.configure({ noCache: true });
 	
 	mkdirp( tmp );
 	list();
