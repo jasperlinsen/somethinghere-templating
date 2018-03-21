@@ -3,15 +3,8 @@ plugins.wysiwyg = function(){
 	
 	console.log( 'WYSIWYG Editor initialised' );
 	
-	let selection = window.getSelection();
-	
 	return function( data, Editor ){
 		
-		function update(){
-			
-			Editor.update( content.innerHTML );
-			
-		}
 		function createButton( face ){
 			
 			var button = Editor.createElement( 'li' );
@@ -28,10 +21,13 @@ plugins.wysiwyg = function(){
 		const insideNodes = function(){
 			
 			function clickHandlerConstructor( _tagName ){
-			
+				
 				// This will allow adding of tags inside nodes.
 				// They can only fire if we are _inside_ the same text node!
 			
+				var tag = _tagName.toLowerCase();
+				var fuseTagRegex = new RegExp( `<\/${tag}>(\s{0,})<${tag}>`, 'g' );
+				
 				return function( event ){
 					
 					event.preventDefault();
@@ -44,31 +40,54 @@ plugins.wysiwyg = function(){
 				
 					var { end, node, start } = selected;
 					var { parentNode, tagName, innerText, outerHTML, innerHTML } = node;
-				
-					if( start !== end ){
 					
-						if( start === 0 && end == innerText.length && tagName === _tagName ){
+					var isEntireContent = start === 0 && end == innerText.length;
+					
+					if( start !== end && !isEntireContent ){
+					
+						if( node.tagName !== _tagName ){
+					
+							let newHTML = innerHTML.split('');
+				
+							newHTML.splice( end, 0, `</${tag}>` );
+							newHTML.splice( start, 0, `<${tag}>` );
+				
+							node.innerHTML = newHTML.join('');
+							
+							selected = null;
+					
+							console.log( 'add', start );
 						
-							// Selected all the content of this node.
-							// Remove the outer node when clicked.
+						}
 						
+						parentNode.innerHTML = parentNode.innerHTML.replace( fuseTagRegex, '' );
+				
+					} else {
+						
+						// Carret is inside Node
+						// Insert or remove the tag node when clicked.
+							
+						if( node.tagName !== _tagName ){
+							
+							node.innerHTML = `<${tag}>${node.innerHTML}</${tag}>`;
+							
+							selected.node = node.querySelector( tag );
+							
+						} else {
+							
 							parentNode.innerHTML = parentNode.innerHTML.replace(
 								outerHTML,
 								innerHTML
 							);
-						
-						} else {
-					
-							let newHTML = innerHTML.split('');
-				
-							newHTML.splice( end, 0, `</${_tagName.toLowerCase()}>` );
-							newHTML.splice( start, 0, `<${_tagName.toLowerCase()}>` );
-				
-							node.innerHTML = newHTML.join('');
+							
+							selected.node = parentNode;
 						
 						}
-				
+						
 					}
+					
+					update();
+					active();
 				
 				}
 			
@@ -76,8 +95,10 @@ plugins.wysiwyg = function(){
 			function create( tagName, buttonName ){
 			
 				var button = createButton( buttonName );
-		
-				button.addEventListener( 'click', clickHandlerConstructor( tagName ) )
+				var name = tagName.toUpperCase();
+				
+				button.setAttribute( 'name', name );
+				button.addEventListener( 'click', clickHandlerConstructor( name ) )
 				button.addEventListener( 'click', update )
 				
 				domElement.appendChild( button );
@@ -88,91 +109,238 @@ plugins.wysiwyg = function(){
 				// Still work to do here
 				
 				var { anchorNode, focusNode, anchorOffset, focusOffset } = selection;
-			
-				if( 
-					anchorNode === focusNode 
-					&& anchorOffset !== focusOffset 
-					&& anchorNode === focusNode
-				){
+				var singleNode = anchorNode === focusNode;
+				var isCollapsed = anchorOffset !== focusOffset;
+				
+				if( singleNode ){
 				
 					selected = {
-						start: anchorOffset,
-						end: focusOffset,
+						start: Math.min( anchorOffset, focusOffset ),
+						end: Math.max( anchorOffset, focusOffset ),
 						node: anchorNode.parentNode
-					}
-				
-					disable();
+					};
+					
+					active();
+					enable();
 				
 				} else {
 				
 					selected = null;
-				
-					enable();
+					
+					active();
+					disable();
 				
 				}
 			
 			}
+			function active(){
+				
+				[ ...domElement.childNodes ].forEach(button => {
+					
+					if( selected && selected.node.tagName === button.getAttribute( 'name' ) ){
+						
+						button.classList.add( 'active' );
+						
+					} else {
+						
+						button.classList.remove( 'active' );
+						
+					}
+					
+				});
+				
+			}
 			function disable(){
 				
-				domElement.classList.remove( 'disabled' );
+				domElement.classList.add( 'disabled' );
 				
 			}
 			function enable(){
 				
-				domElement.classList.add( 'disabled' );
+				domElement.classList.remove( 'disabled' );
 				
 			}
 			
 			var selected = null;
 			var domElement = Editor.createElement( 'ul' );
 			
-			domElement.classList.add( 'items', 'plugins-wysiwyg-items-insideNode' );
+			domElement.classList.add(
+				'plugins-wysiwyg-toolbar-group',
+				'plugins-wysiwyg-items-insideNode'
+			);
 			
 			return { domElement, create, check, disable, enable };
 		
 		}();
-		
-		var wrapper = Editor.createElement( 'div' );
-		var tools = Editor.createElement( 'div' );
-		var content = Editor.createElement( 'div' );
-		var commands = [ insideNodes ];
-		
-		commands.forEach( command => tools.appendChild( command.domElement ) );
-		
-		insideNodes.create( 'STRONG', 'Bold' );
-		insideNodes.create( 'EM', 'Italic' );
-		
-		wrapper.classList.add( 'plugins-wysiwyg' );
-		tools.classList.add( 'plugins-wysiwyg-items' );
-		content.classList.add( 'plugins-wysiwyg-content' );
-		
-		content.innerHTML = data;
-		content.contentEditable = true;
-		
-		document.addEventListener( 'selectionchange', event => {
+		const classableNodes = function(){
 			
-			var contentInFocus = document.activeElement === content;
+			function create( tagName, classList ){
+				
+				list[ tagName.toUpperCase() ] = classList;
 			
-			commands.forEach(command => {
+			}
+			function check(){
 				
-				if( contentInFocus ){
+				// Still work to do here
 				
-					command.check()
+				var { anchorNode, focusNode, anchorOffset, focusOffset } = selection;
+				var singleNode = anchorOffset === focusOffset && anchorNode === focusNode;
 				
+				if( singleNode && selected !== anchorNode.parentNode ){
+					
+					selected = anchorNode.parentNode;
+					
+					active();
+					
+				} else if( !singleNode ){
+					
+					disable();
+					
+				}
+			
+			}
+			function active( node ){
+				
+				selectElement.innerHTML = '';
+				
+				if( selected && list[ selected.tagName.toUpperCase() ] ){
+					
+					let hasClass = false;
+					
+					list[ selected.tagName.toUpperCase() ].forEach(_class => {
+						
+						let option = document.createElement( 'option' );
+						
+						option.value = _class;
+						option.textContent = _class;
+						
+						if( selected.classList.contains( _class ) ){
+							
+							hasClass = true;
+							option.selected = selected.classList.contains( _class );
+						
+						}
+						
+						selectElement.appendChild( option );
+						
+					});
+					
+					let option = document.createElement( 'option' );
+					
+					option.textContent = 'None';
+					option.selected = !hasClass;
+					
+					selectElement.insertBefore( option, selectElement.childNodes[ 0 ] );
+					
+					enable();
+					
 				} else {
 					
-					command.disable();
+					disable();
+					
+				}
+				
+			}
+			function disable(){
+				
+				selectElement.disabled = true;
+				domElement.classList.add( 'disabled' );
+				
+			}
+			function enable(){
+				
+				selectElement.disabled = false;
+				domElement.classList.remove( 'disabled' );
+				
+			}
+			
+			var list = {};
+			var selected = null;
+			var domElement = Editor.createElement( 'div' );
+			var selectElement = Editor.createElement( 'select' );
+			
+			domElement.appendChild( selectElement );
+			domElement.classList.add(
+				'plugins-wysiwyg-toolbar-group',
+				'plugins-wysiwyg-items-classableNodes'
+			);
+			
+			selectElement.addEventListener( 'change', event => {
+				
+				if( selected && list[ selected.tagName.toUpperCase() ] ){
+					
+					let _list = list[ selected.tagName.toUpperCase() ];
+					
+					if( _list ){
+					
+						selected.classList.remove( ..._list );
+						selected.classList.add( selectElement.value );
+					
+					}
 					
 				}
 				
 			});
 			
+			disable();
+			
+			return { domElement, create, check, disable, enable };
+		
+		}();
+		
+		var iframe = Editor.createElement( 'iframe' );
+		var wrapper = Editor.createElement( 'div' );
+		var tools = Editor.createElement( 'div' );
+		var content = Editor.createElement( 'div' );
+		var commands = [ insideNodes, classableNodes ];
+		var selection;
+		var update;
+		
+		commands.forEach( command => tools.appendChild( command.domElement ) );
+		
+		insideNodes.create( 'STRONG', 'Bold' );
+		insideNodes.create( 'EM', 'Italic' );
+		insideNodes.create( 'SPAN', 'Span' );
+		
+		classableNodes.create( 'STRONG', [ 'class--a' ] );
+		classableNodes.create( 'EM', [ 'class--b' ] );
+		
+		wrapper.classList.add( 'plugins-wysiwyg' );
+		tools.classList.add( 'plugins-wysiwyg-toolbar' );
+		iframe.classList.add( 'plugins-wysiwyg-content' );
+		
+		iframe.sandbox = 'allow-same-origin allow-scripts';
+		iframe.srcdoc = data;
+		iframe.addEventListener( 'load', event => {
+			
+			var document = iframe.contentDocument;
+			var body = document.body;
+			
+			update = function(){
+				
+				Editor.update( body.innerHTML );
+			
+			}
+			
+			selection = document.getSelection();
+			
+			document.addEventListener( 'selectionchange', event => {
+			
+				commands.forEach(command => {
+					
+					command.check();
+				
+				});
+			
+			});
+			
+			body.contentEditable = true;
+			body.addEventListener( 'input', update );
 			
 		});
-		content.addEventListener( 'input', update );
 		
 		wrapper.appendChild( tools );
-		wrapper.appendChild( content );
+		wrapper.appendChild( iframe );
 	
 		return wrapper;
 	

@@ -1,0 +1,29 @@
+<!doctype html>
+<head>
+	<title>wysiwig editor test</title>
+	<link rel="stylesheet" type="text/css" href=".editor-tmp/tmp.css" />
+</head>
+<body>
+
+<div id="intro" style="display: none;">
+
+<h1>This is a title</h1>
+
+<p>It feels like im chasing the guy from Lucky Charms</p>
+
+</div>
+
+<script type="text/javascript" src=".editor-tmp/tmp.js"></script>
+<script type="text/javascript">
+
+var data = document.getElementById( 'intro' ).innerHTML;
+
+document.body.appendChild( plugins.wysiwyg( data, {
+	createElement: createEditorElement,
+	update( data ){ console.log( data ) }
+}) );
+
+</script>
+
+</body>
+</html>

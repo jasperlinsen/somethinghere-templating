@@ -1,26 +1,135 @@
 .plugins-wysiwyg {
 	
+	max-width: 800px;
+	margin: 0px auto;
+	border: 1px solid color( background );
+	
 	&-content {
 		
-		@import '../../../css/main';
-	
+		width: 100%;
+		min-height: 200px;
+		border-top: 1px solid color( background );
+		
 	}
 	
-	&-items { 
+	&-toolbar {
+		
+		width: 100%;
+		display: flex;
+		background: #000;
+		align-items: center;
+		
+	}
 	
-		* {
-	
-			@extend %no-user-select;
-	
+	&-toolbar-group {
+		
+		$color: #666;
+		$background: linear-gradient( #ececec, #ddd );
+		
+		display: flex;
+		width: auto;
+		border: 1px solid $color;
+		margin: .25em;
+		overflow: hidden;
+		border-radius: .2em;
+		background: $background;
+		
+		select {
+			
+			padding: 0 1em;
+			height: 2.75em;
+			width: 100px;
+			border: none;
+			-webkit-appearance: none;
+			appearance: none;
+			background-position: right 10px top 50%;
+			
 		}
 		
-		.disabled {
+		li[name]{
+			
+			width: 2em;
+			height: 2em;
+			position: relative;
+			color: transparent;
+			overflow: hidden;
+			border-left: 1px solid $color;
+			overflow: hidden;
+			
+			a, &:before{
+			
+				position: absolute;
+				left: 50%;
+				top: 50%;
+				transform: translate(-50%,-50%);
+				
+			}
+			
+			a {
+				
+				color: transparent;
+				overflow: hidden;
+				width: 100%;
+				height: 100%;
+				box-sizing: border-box;
+				box-shadow: inset 3px 3px 5px rgba( #000, .2 );
+				transition: box-shadow .4s;
+				
+			}
+			
+			&.active {
+				
+				background: $color;
+				
+				a {
+					
+					box-shadow: inset 3px 3px 5px rgba( #000, .2 );
+			
+				}
+			
+				&:before {
+				
+					color: #fff;
+				
+				}
+			
+			}
+			
+			&:hover {
+				
+				a {
+				
+					box-shadow: inset -3px -3px 5px rgba( #000, .2 );
+				
+				}
+			
+			}
+			
+			&:first-child {
+				
+				border-left: 0;
+				
+			}
+			
+			&:before {
+				
+				color: $color;
+				
+			}
+			
+			&[name="STRONG"]:before { content: 'B'; }
+			&[name="EM"]:before { content: 'I'; }
+			&[name="SPAN"]:before { content: '()'; }
+			
+		}
+		
+		&.disabled {
 			
 			opacity: .5;
 			pointer-events: none;
 			
 		}
-	
+		
 	}
 	
 }
