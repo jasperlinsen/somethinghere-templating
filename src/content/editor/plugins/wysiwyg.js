@@ -112,7 +112,7 @@ plugins.wysiwyg = function(){
 				var singleNode = anchorNode === focusNode;
 				var isCollapsed = anchorOffset !== focusOffset;
 				
-				if( singleNode ){
+				if( singleNode && anchorNode.parentNode ){
 				
 					selected = {
 						start: Math.min( anchorOffset, focusOffset ),
@@ -190,6 +190,8 @@ plugins.wysiwyg = function(){
 					
 					selected = anchorNode.parentNode;
 					
+					console.log( selected );
+					
 					active();
 					
 				} else if( !singleNode ){
@@ -228,6 +230,7 @@ plugins.wysiwyg = function(){
 					let option = document.createElement( 'option' );
 					
 					option.textContent = 'None';
+					option.value = '';
 					option.selected = !hasClass;
 					
 					selectElement.insertBefore( option, selectElement.childNodes[ 0 ] );
@@ -272,9 +275,14 @@ plugins.wysiwyg = function(){
 					let _list = list[ selected.tagName.toUpperCase() ];
 					
 					if( _list ){
-					
+						
 						selected.classList.remove( ..._list );
-						selected.classList.add( selectElement.value );
+						
+						if( selectElement.value ){
+						
+							selected.classList.add( selectElement.value );
+						
+						}
 					
 					}
 					
@@ -304,6 +312,7 @@ plugins.wysiwyg = function(){
 		
 		classableNodes.create( 'STRONG', [ 'class--a' ] );
 		classableNodes.create( 'EM', [ 'class--b' ] );
+		classableNodes.create( 'H1', [ 'class--c' ] );
 		
 		wrapper.classList.add( 'plugins-wysiwyg' );
 		tools.classList.add( 'plugins-wysiwyg-toolbar' );
