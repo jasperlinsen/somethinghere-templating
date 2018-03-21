@@ -8,34 +8,34 @@
 	<link rel="stylesheet" href="/css" type="text/css" />
 	
 </head>
-<body>
+<body class="editor">
 
 {% import './macros/messages.njks' as messages %}
 {{ messages.render( info.messages ) }}
 	
-<main>
+<main class="editor">
 	{% import './macros/header.njks' as header %}
 	{{ header.render( 'Home' ) }}
-	<article>
+	<article class="editor">
 		
-		<ul class="tab files" id="edit">
+		<ul class="editor tab files" id="edit">
 		{% for file in allFiles %}
 			<li>
-				<a href="/{{file}}" class="file">{{file | replace( info.out, '' ) | replace( '.json', '' ) }}</a>
-				<ul>
-					<li><a href="/{{file}}" class="file-edit">E</a></li>
-					<li><a href="/delete/{{file}}" class="file-delete">D</a></li>
-					<li><a href="/{{file}}" class="file-move">M</a></li>
+				<a href="/{{file}}" class="editor file">{{file | replace( info.out, '' ) | replace( '.json', '' ) }}</a>
+				<ul class="editor">
+					<li><a href="/{{file}}" class="editor file-edit">E</a></li>
+					<li><a href="/delete/{{file}}" class="editor file-delete">D</a></li>
+					<li><a href="/{{file}}" class="editor file-move">M</a></li>
 				</ul>
 			</li>
 		{% endfor %}
 		</ul>
 		
-		<ul class="tab files" id="new">
+		<ul class="editor tab files" id="new">
 		{% for template in allTemplates %}
-			<li>
-				<a href="/{{template}}" class="file">{{template | replace( info.templates, '' ) | replace( '.json', '' )}}</a>
-			</li>
+			<li class="editor">
+				<a href="/{{template}}" class="editor file">{{template | replace( info.templates, '' ) | replace( '.json', '' )}}</a>
+			</li class="editor">
 		{% endfor %}
 		</ul>
 		

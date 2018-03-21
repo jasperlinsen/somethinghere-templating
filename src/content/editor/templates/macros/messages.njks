@@ -1,7 +1,7 @@
 {% macro render( messages ) %}
 
 {% for message in messages %}
-<aside class="message">{{message}}</aside>
+<aside class="message editor">{{message}}</aside>
 {% endfor %}
 
 {% endmacro %}

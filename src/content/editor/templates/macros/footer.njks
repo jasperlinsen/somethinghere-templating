@@ -1,8 +1,8 @@
 {% macro render( elements = [] ) %}
-<footer>
+<footer class="editor">
 	{% for element in elements %}
 	{{ element | safe }}
 	{% endfor %}
-	<p>&copy; 2018 Something Here.</p>
+	<p class="editor">&copy; 2018 Something Here.</p>
 </footer>
 {% endmacro %}

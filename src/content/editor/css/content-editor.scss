@@ -10,7 +10,7 @@
 	
 }
 
-* {
+*.editor {
 
 	box-sizing: border-box;
 
@@ -20,13 +20,13 @@ html, body {
 	height: 100%;
 	
 }
-body {
+body.editor {
 	
 	font-family: font( body );
 	background: color( bg );
 	
 }
-label {
+label.editor {
 	
 	width: 100%;
 	display: flex;
@@ -36,7 +36,7 @@ label {
 	justify-content: space-between;
 	align-items: center;
 	
-	strong:before {
+	> strong:before {
 		
 		content: '';
 		display: inline-block;
@@ -98,9 +98,9 @@ label {
 	}
 	
 }
-select,
-input,
-textarea {
+select.editor,
+input.editor,
+textarea.editor {
 	
 	-webkit-appearance: none;
 	appearance: none;
@@ -110,7 +110,7 @@ textarea {
 	font-family: select( code );
 	
 }
-select {
+select.editor {
 	
 	display: block;
 	background: #fff;
@@ -122,7 +122,7 @@ select {
 	background-position: right size( gutter ) top 50%;
 	
 }
-input[type="button"]{
+input.editor[type="button"]{
 	
 	@extend %input;
 	
@@ -146,7 +146,7 @@ input[type="button"]{
 	}
 	
 }
-input[type="checkbox"]{
+input.editor[type="checkbox"]{
 
 	@extend %checkmark;
 	
@@ -167,21 +167,21 @@ input[type="checkbox"]{
 	}
 	
 }
-[type="array"],
-[type="object"] {
+.editor[type="array"],
+.editor[type="object"] {
 	
 	display: block;
 	width: 100%;
 	
 }
 
-article, header, footer {
+article.editor, header.editor, footer.editor {
 	
 	background: #fff;
 	padding: size( gutter );
 	
 }
-header, footer {
+header.editor, footer.editor {
 	
 	color: #fff;
 	background: color( bg-secondary );
@@ -191,12 +191,12 @@ header, footer {
 	font-size: .75em;
 	
 }
-article {
+article.editor {
 	
 	overflow: auto;
 	
 }
-h1 {
+h1.editor {
 	
 	font-family: font( header );
 	font-size: 1.6em;
@@ -205,7 +205,7 @@ h1 {
 	overflow: hidden;
 	
 }
-main {
+main.editor {
 	
 	margin: 0px auto;
 	height: 100%;
@@ -279,8 +279,8 @@ main {
 	
 }
 
-.tabs,
-.items {
+.editor.tabs,
+.editor.items {
 	
 	display: flex;
 	overflow: hidden;
@@ -330,7 +330,7 @@ main {
 	}
 		
 }
-.tab {
+.editor.tab {
 	
 	display: none;
 	
@@ -341,7 +341,7 @@ main {
 	}
 	
 }
-.files {
+.editor.files {
 	
 	display: none;
 	flex-wrap: wrap;
@@ -500,7 +500,7 @@ main {
 	}
 	
 }
-.message {
+.editor.message {
 	
 	@keyframes out {
 		from { transform: translateY(0); opacity: 1; }
@@ -527,7 +527,7 @@ main {
 	}
 	
 }
-.popover {
+.editor.popover {
 	
 	position: fixed;
 	top: 0;
@@ -551,3 +551,5 @@ main {
 	}
 	
 }
+
+@import '../plugins/wysiwyg.scss';

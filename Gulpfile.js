@@ -165,13 +165,101 @@ function gulp_syncServer(){
 	
 }
 function gulp_editorServer(){
+	
+	function js( callback = () => {} ){
+		
+		if( js.processing ){
+			
+			js.processing.push( callback );
+			
+			return;
+		
+		} else {
+			
+			js.processing = [ callback ];
+		
+		}
+		
+		fs.readdir( src + 'scripts', ( err, scripts ) => {
+		fs.readdir( src + 'plugins', ( err, plugins ) => {
+			
+			let data = [
+				...(scripts || []).map( f => src + 'scripts/' + f ),
+				...(plugins || []).map( f => src + 'plugins/' + f )
+			].reduce((file, path) => {
+				
+				if( path.slice( -3 ) === '.js' ){
 					
-	function css(){
+					let p = path.replace(src,'').replace('/', ': ').toUpperCase();
+					
+					file += `\n\n// ${p}\n${fs.readFileSync( path ).toString()}`;
+					
+				}
+				
+				return file;
+				
+			}, '// Compiled file');
+			
+			fs.writeFile( tmp + 'tmp.js', data, function( err, success ){
+				
+				console.log( '[css] Updated JS file' );
+				
+				js.processing.forEach(callback => callback( tmp + 'tmp.js' ));
+				js.processing = false;
+				
+			});
+			
+		})});
+		
+	}	
+	function css( callback = () => {} ){
+	
+		if( css.processing ){
+			
+			css.processing.push( callback );
+			
+			return;
+		
+		} else {
+			
+			css.processing = [ callback ];
+		
+		}
+		
+		fs.readdir( tmp, ( err, list ) => {
+			
+			let data = (list || []).reduce((file, path) => {
+				
+				if( path.slice( -4 ) === '.css' && path.indexOf( 'tmp' ) !== 0 ){
+					
+					let p = path.replace(src,'').replace('/', ': ').toUpperCase();
+					
+					file += `\n\n/* ${p} */\n${fs.readFileSync( tmp + path ).toString()}`;
+					
+				}
+				
+				return file;
+				
+			}, '/*Compiled CSS*/');
+			
+			fs.writeFile( tmp + 'tmp.css', data, function( err, success ){
+				
+				console.log( '[css] Updated CSS file' );
+		
+				css.processing.forEach(callback => callback( tmp + 'tmp.css' ));
+				css.processing = false;
+				
+			});
+			
+		});
+		
+	}	
+	function compass( callback = () => {} ){
 		
 		// Compile CSS file into a hidden temporary directory
 		gulp_task_css( [ src + 'css/**/*.scss' ], [ tmp ] );
-	
-		console.log( '[css] Updated CSS file' );
+		
+		callback();
 		
 	}
 	function list(){
@@ -281,18 +369,48 @@ function gulp_editorServer(){
 				
 				// Serve the single CSS file
 				
-				res.writeHead( 200, {'Content-Type': 'text/css'} );
-				res.write( fs.readFileSync( tmp + 'content-editor.css' ).toString() );
-				res.end();
+				function resolveCSS(){
+				
+					res.writeHead( 200, {'Content-Type': 'text/css'} );
+					res.write( fs.readFileSync( tmp + 'tmp.css' ).toString() );
+					res.end();
+				
+				};
+				
+				if( css.processing ){
+				
+					css( resolveCSS );
+				
+				} else {
+					
+					resolveCSS();
+					
+				}
+				
 				break;
 			
 			case '/script':
 				
-				// Serve the single JS file (when we have it)
+				// Serve the single JS file
 				
-				res.writeHead( 200, {'Content-Type': 'application/javascript'} );
-				res.write( fs.readFileSync( src + 'scripts/main.js' ).toString() );
-				res.end();
+				function resolveScript(){
+				
+					res.writeHead( 200, {'Content-Type': 'application/javascript'} );
+					res.write( fs.readFileSync( tmp + 'tmp.js' ).toString() );
+					res.end();
+				
+				};
+				
+				if( js.processing ){
+				
+					js( resolveScript );
+				
+				} else {
+					
+					resolveScript();
+					
+				}
+				
 				break;
 			
 			default: 
@@ -491,15 +609,20 @@ function gulp_editorServer(){
 	var { port, tmp, src, templates, out } = settings.EDITOR;
 	var allTemplates = [];
 	var allFiles = [];
+	var wait;
 	
 	nunjucks.configure({ noCache: true });
 	
 	mkdirp( tmp );
 	list();
+	compass();
 	css();
+	js();
 	
 	watch( [ out + '**/*.json', templates + '**/*.json', ...paths.content.watch ], () => list() );
-	watch( [ src + 'css/**/*.scss' ], () => css() );
+	watch( [ src + 'css/**/*.scss', src + 'plugins/**/*.scss' ], () => compass() );
+	watch( [ tmp + '**/*.css', '!' + tmp + '**/tmp.css' ], () => css() );
+	watch( [ src + 'scripts/**/*.js', src + 'plugins/**/*.js' ], () => js() );
 	
 	var server = http.createServer(function( req, res ){
 		

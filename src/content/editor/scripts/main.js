@@ -18,8 +18,8 @@ function makeTabs( root = document, nav = document.querySelector( '#tabs' ) ){
 			
 		}
 		
-		var anchor = document.createElement( 'a' );
-		var anchorItem = document.createElement( 'li' );
+		var anchor = createEditorElement( 'a' );
+		var anchorItem = createEditorElement( 'li' );
 		
 		if( index === 0 ){
 			
@@ -95,11 +95,11 @@ function makeFiles( root = document ){
 				
 				var file = href.split( '/' ).pop();
 				var origin;
-				var popover = document.createElement( 'div' );
-				var wrapper = document.createElement( 'div' );
-				var select = document.createElement( 'select' );
-				var button = document.createElement( 'input' );
-				var cancel = document.createElement( 'input' );
+				var popover = createEditorElement( 'div' );
+				var wrapper = createEditorElement( 'div' );
+				var select = createEditorElement( 'select' );
+				var button = createEditorElement( 'input' );
+				var cancel = createEditorElement( 'input' );
 				
 				Object.keys( moveToPaths ).map(key => {
 					
@@ -111,7 +111,7 @@ function makeFiles( root = document ){
 				}).sort((a,b) => b.matches - a.matches).forEach((data, index) => {
 					
 					var { key, value, matches } = data;
-					var option = document.createElement( 'option' );
+					var option = createEditorElement( 'option' );
 					
 					option.textContent = key;
 					option.value = value;
@@ -295,16 +295,28 @@ function clamp( value, min, max ){
 	return value < min ? min : (value > max ? max : value);
 	
 }
+function createEditorElement( type ){
+	
+	// All elements styled by the editor need to have .editor!
+	// This is to make any plugins possible to just read styles defined somewhere else.
+	
+	var element = document.createElement( type );
+	
+	element.classList.add( 'editor' );
+	
+	return element;
+	
+}
 
-function get_json_predefined_path( path ){
+function get_json_predefined( path ){
 	
 	return json.meta.predefined[ path.replace( '.data.', '' ).replace( /[0-9\[\]]+/gi, '' ) ];
 	
 }
 function make_json_string( data, path ){
 	
-	var input = document.createElement( 'input' );
-	var predefined = get_json_predefined_path( path );
+	var input = createEditorElement( 'input' );
+	var predefined = get_json_predefined( path );
 	
 	if( predefined === null ){
 		
@@ -315,11 +327,11 @@ function make_json_string( data, path ){
 	
 	if( typeof predefined === 'object' ){
 		
-		input = document.createElement( 'select' );
+		input = createEditorElement( 'select' );
 		
 		Object.keys( predefined ).forEach(key => {
 			
-			let option = document.createElement( 'option' );
+			let option = createEditorElement( 'option' );
 			
 			option.textContent = key;
 			option.value = predefined[ key ];
@@ -340,11 +352,24 @@ function make_json_string( data, path ){
 			
 		});
 		
-	} else if( typeof predefined === 'string' ){
+	} else if( typeof predefined === 'string' && plugins[ predefined ] ){
 		
-		input.setAttribute( 'data-editor', predefined );
-		input.type = 'text';
-		input.value = data;
+		let mockElement = input;
+		
+		mockElement.name = path;
+		mockElement.addEventListener( 'change', event_change_input );
+		
+		input = plugins[ predefined ]( data, {
+		
+			update: function( data ){
+			
+				mockElement.value = data;
+				event_change_input({ target: mockElement });
+				
+			},
+			createElement: createEditorElement
+		
+		});
 		
 	} else {
 		
@@ -354,15 +379,15 @@ function make_json_string( data, path ){
 	}
 	
 	input.name = path;
-	input.addEventListener( 'change', event_change_input )
+	input.addEventListener( 'change', event_change_input );
 	
 	return input;
 	
 }
 function make_json_boolean( data, path ){
 	
-	var input = document.createElement( 'input' );
-	var predefined = get_json_predefined_path( path );
+	var input = createEditorElement( 'input' );
+	var predefined = get_json_predefined( path );
 	
 	if( predefined === null ){
 		
@@ -383,8 +408,8 @@ function make_json_boolean( data, path ){
 }
 function make_json_number( data, path ){
 	
-	var input = document.createElement( 'input' );
-	var predefined = get_json_predefined_path( path );
+	var input = createEditorElement( 'input' );
+	var predefined = get_json_predefined( path );
 	
 	if( predefined === null ){
 		
@@ -403,8 +428,8 @@ function make_json_number( data, path ){
 }
 function make_json_array( data, path, parent ){
 
-	var predefined = get_json_predefined_path( path );
-	var array = document.createElement( 'div' );
+	var predefined = get_json_predefined( path );
+	var array = createEditorElement( 'div' );
 	
 	if( predefined === null ){
 		
@@ -420,12 +445,12 @@ function make_json_array( data, path, parent ){
 	data.forEach(( item, index ) => {
 		
 		let _path = `${path}[${index}]`;
-		let _predefined = get_json_predefined_path( _path );
+		let _predefined = get_json_predefined( _path );
 		let _name = nameStorage.get( item ) || nameStorage.set( item, _path ).get( item );
 		
-		let label = document.createElement( 'label' );
-		let items = document.createElement( 'ul' );
-		let labelContent = document.createElement( 'strong' );
+		let label = createEditorElement( 'label' );
+		let items = createEditorElement( 'ul' );
+		let labelContent = createEditorElement( 'strong' );
 		
 		items.classList.add( 'items' );
 		
@@ -445,14 +470,14 @@ function make_json_array( data, path, parent ){
 		
 		if( predefined ){
 			
-			let remove = document.createElement( 'li' );
-			let removeBTN = document.createElement( 'a' );
+			let remove = createEditorElement( 'li' );
+			let removeBTN = createEditorElement( 'a' );
 			
-			let moveup = document.createElement( 'li' );
-			let moveupBTN = document.createElement( 'a' );
+			let moveup = createEditorElement( 'li' );
+			let moveupBTN = createEditorElement( 'a' );
 			
-			let movedown = document.createElement( 'li' );
-			let movedownBTN = document.createElement( 'a' );
+			let movedown = createEditorElement( 'li' );
+			let movedownBTN = createEditorElement( 'a' );
 			
 			removeBTN.textContent = 'remove';
 			removeBTN.classList.add( 'remove', 'button' );
@@ -502,7 +527,7 @@ function make_json_array( data, path, parent ){
 	
 	if( predefined ){
 	
-		let add = document.createElement( 'input' );
+		let add = createEditorElement( 'input' );
 		add.type = 'button';
 		add.value = 'add';
 		add.addEventListener('click', e => {
@@ -524,8 +549,8 @@ function make_json_object( data, path, parent ){
 	
 	// Using object.assign will ensure no keys are forgotten, even if they get added later by the predefined
 	
-	var object = document.createElement( 'div' );
-	var predefined = get_json_predefined_path( path );
+	var object = createEditorElement( 'div' );
+	var predefined = get_json_predefined( path );
 	var _data = Object.assign( {}, predefined, data );
 	
 	if( predefined === null ){
@@ -542,7 +567,7 @@ function make_json_object( data, path, parent ){
 	Object.keys( _data ).forEach(key => {
 	
 		let _path = `${path}.${key}`;
-		let _predefined = get_json_predefined_path( _path );
+		let _predefined = get_json_predefined( _path );
 		
 		if( _predefined === null ){
 			
@@ -551,8 +576,8 @@ function make_json_object( data, path, parent ){
 			
 		}
 		
-		let label = document.createElement( 'label' );
-		let labelContent = document.createElement( 'strong' );
+		let label = createEditorElement( 'label' );
+		let labelContent = createEditorElement( 'strong' );
 		
 		labelContent.textContent = key;
 		labelContent.addEventListener( 'click', event => {
@@ -573,7 +598,7 @@ function make_json_object( data, path, parent ){
 }
 function make_json_editor( data, parent, path = '' ){
 	
-	var predefined = get_json_predefined_path( path )
+	var predefined = get_json_predefined( path )
 	
 	if( predefined === null || data === null ) return null;
 	
@@ -723,5 +748,6 @@ function event_save( event ){
 	
 }
 
+const plugins = {};
 const nameStorage = new WeakMap;
 const stripArrayRegex = /[0-9\[\]]+/gi;

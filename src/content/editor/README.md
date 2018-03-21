@@ -82,6 +82,36 @@ The editor also adds a list of templated to the predefined for the `.meta.in` va
 
 Self is used by the editor to store where the file is located, and it will save to this location when prompted. By default, this is hidden in the editor. When self is empty, clicking 'save' will prompt the user to enter a filename for the content, which will then be saved at `settings.EDITOR.out`.
 
+## Plugins
+
+Editing plugins can be added by including a `plugin.js` and `plugin.scss` file. A default JS plugin looks like this:
+
+	plugins[ 'My plugin Name' ] = function(){
+		
+		// Any private variables shared by your plugin here.
+		
+		return function(
+			data:String, // The data to initialise your editor with
+			Editor:{
+				update( data:String ), // Call this to update the JSON on change with new data
+				createElement( type:String( tagname) ) // Call this to create an element that is styled like the editor.
+			}
+		){
+	
+			var input = Editor.createElement( 'input' );
+		
+			input.type = 'text';
+			input.addEventListener( 'change', event => {
+		
+				Editor.update( input.value );
+		
+			});
+	
+			return input;
+	
+		}
+	
+	}();
 
 ## Roadmap
 

@@ -7,6 +7,7 @@
 				"content": "A 'content'",
 				"list": []
 			},
+			"content.content": "wysiwyg",
 			"content.list":{
 				"title":"A Link",
 				"link": "#",

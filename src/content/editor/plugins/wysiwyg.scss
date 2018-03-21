@@ -1,0 +1,26 @@
+.plugins-wysiwyg {
+	
+	&-content {
+		
+		@import '../../../css/main';
+	
+	}
+	
+	&-items { 
+	
+		* {
+	
+			@extend %no-user-select;
+	
+		}
+		
+		.disabled {
+			
+			opacity: .5;
+			pointer-events: none;
+			
+		}
+	
+	}
+	
+}
