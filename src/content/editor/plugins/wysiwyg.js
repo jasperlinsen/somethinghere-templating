@@ -174,6 +174,9 @@ plugins.wysiwyg = function(){
 		}();
 		const classableNodes = function(){
 			
+			// TODO: Make it so you can have multiple classes per option
+			// AKA `button primary` will check for both classNames (otherwise classList breaks!)
+			
 			function create( tagName, classList ){
 				
 				list[ tagName.toUpperCase() ] = classList;
@@ -295,12 +298,263 @@ plugins.wysiwyg = function(){
 			return { domElement, create, check, disable, enable };
 		
 		}();
+		const insertableNodes = function(){
+			
+			function setAttributes( attributes, element ){
+			
+				Object.keys( attributes ).forEach(key => {
+					
+					switch( key ){
+						
+						case 'textContent':
+						
+							element.textContent = attributes[ key ];
+							break;
+							
+						default:
+						
+							element.setAttribute( key, attributes[ key ] );
+						
+					}
+					
+				});
+				
+				return element;
+						
+			}
+			function getAttributes( attributes, element ){
+					
+				return Object.assign( {}, Object.keys( attributes ).reduce(( object, key ) => {
+					
+					switch( key ){
+						
+						case 'textContent':
+						
+							object[ key ] = element.textContent || attributes.textContent;
+							break;
+							
+						default:
+						
+							object[ key ] = element.getAttribute( key ) || attributes[ key ];
+						
+					}
+					
+					return object;
+					
+				}, {}));
+				
+			}
+			
+			function createPopup( defaultAttributes, elementOrTag ){
+				
+				function close(){
+					
+					popup.remove();
+					
+				}
+				
+				var element;
+				var { start, end, node, text } = selected;
+				var attributes = Object.assign( {}, defaultAttributes );
+				
+				var popup = Editor.createElement( 'div' );
+				var popupContent = Editor.createElement( 'div' );
+				var confirmButton = Editor.createElement( 'input' );
+				var cancelButton = Editor.createElement( 'input' );
+				var buttonWrapper = Editor.createElement( 'div' );
+				
+				if( typeof elementOrTag === 'string' ){
+					
+					/* Create a new element */
+					
+					element = document.createElement( elementOrTag );
+					attributes = getAttributes( attributes, element );
+					
+					if( attributes.hasOwnProperty( 'textContent' ) && text ){
+						
+						element.textContent = text;
+						attributes.textContent = text;
+						
+					}
+					
+					confirmButton.addEventListener('click', event => {
+						
+						/* Insert to where the text selection was. Remove the selected text as it is now inside the node. */
+						
+						setAttributes( attributes, element );
+						
+						node.innerHTML = node.innerHTML.slice( 0, start ) + element.outerHTML + node.innerHTML.slice( end );
+						
+					});
+					
+				} else {
+					
+					/* Edit an old element */
+
+					element = elementOrTag;
+					attributes = getAttributes( attributes, element );
+					
+					confirmButton.addEventListener('click', event => {
+						
+						/* Update element. */
+						
+						setAttributes( attributes, element );
+						
+					});
+					
+				}
+				
+				/* Construct a form to fill in */
+				
+				Object.keys( attributes ).forEach(key => {
+					
+					let wrapper = Editor.createElement( 'div' );
+					let label = Editor.createElement( 'label' );
+					let input = Editor.createElement( 'input' );
+					
+					label.textContent = key;
+					input.type = 'text';
+					input.name = key;
+					input.value = attributes[ key ] || '';
+					
+					input.addEventListener( 'change', () => attributes[ key ] = input.value );
+					
+					wrapper.appendChild( label );
+					wrapper.appendChild( input );
+					
+					popupContent.appendChild( wrapper );
+					
+				});
+				
+				/* Add buttons to the wrapper */
+				
+				buttonWrapper.appendChild( cancelButton );
+				buttonWrapper.appendChild( confirmButton );
+				
+				popup.classList.add( 'plugins-wysiwyg-popup' );
+				popup.appendChild( popupContent );
+				
+				cancelButton.type = 'button';
+				cancelButton.value = 'cancel';
+				cancelButton.addEventListener( 'click', close )
+				
+				confirmButton.type = 'button';
+				confirmButton.value = 'confirm';
+				confirmButton.addEventListener( 'click', close )
+				
+				/* Add the popup to the main element */
+				
+				popupContent.appendChild( buttonWrapper );
+				wrapper.appendChild( popup );
+				
+			}
+			function create( tagName, attributeList ){
+				
+				var name = tagName.toUpperCase();
+				var button = createButton( name );
+				
+				button.setAttribute( 'name', name );
+				button.addEventListener( 'click', event => {
+					
+					if( selected ){
+					
+						let { node, top } = selected
+						let attributes = list[ name ];
+						
+						if( top && top.tagName === name ){
+						
+							/* If `top` and `top.tagName` is relevant to this button, we are editing the top element. */
+						
+							createPopup( attributes, top );
+						
+						} else if( node ){
+							
+							/* If there is a node, insert a new one with the tagName (name). */
+							
+							createPopup( attributes, name );
+						
+						}
+					
+					}
+					
+				})
+				
+				domElement.appendChild( button );
+				
+				list[ name ] = attributeList;
+			
+			}
+			function check(){
+				
+				// Still work to do here
+				
+				var { anchorNode, focusNode, anchorOffset, focusOffset } = selection;
+				var singleNode = anchorNode === focusNode;
+				
+				if( singleNode ){
+					
+					let _selected = anchorNode.parentNode;
+					let all = Object.keys( list );
+					
+					while( _selected && all.indexOf( _selected.tagName ) < 0 ){
+						
+						_selected = _selected.parentNode;
+						
+					}
+					
+					selected = {
+						start: Math.min( anchorOffset, focusOffset ),
+						end: Math.max( anchorOffset, focusOffset ),
+						node: anchorNode.parentNode,
+						top: _selected,
+						text: selection.toString()
+					};
+					
+					enable();
+					
+				} else if( !singleNode ){
+					
+					selected = null;
+					
+					disable();
+					
+				}
+			
+			}
+			function active(){
+				
+				// Implement that the correct buttons are set to enabled or disabled. Depending on context
+				
+			}
+			function disable(){
+				
+				domElement.classList.add( 'disabled' );
+				
+			}
+			function enable(){
+				
+				domElement.classList.remove( 'disabled' );
+				
+			}
+			
+			var list = {};
+			var selected = null;
+			var domElement = Editor.createElement( 'div' );
+			
+			domElement.classList.add(
+				'plugins-wysiwyg-toolbar-group',
+				'plugins-wysiwyg-items-insertableNodes'
+			);
+			
+			return { domElement, create, check, disable, enable };
+		
+		}();
 		
 		var iframe = Editor.createElement( 'iframe' );
 		var wrapper = Editor.createElement( 'div' );
 		var tools = Editor.createElement( 'div' );
 		var content = Editor.createElement( 'div' );
-		var commands = [ insideNodes, classableNodes ];
+		var commands = [ insideNodes, classableNodes, insertableNodes ];
 		var selection;
 		var update;
 		
@@ -313,6 +567,10 @@ plugins.wysiwyg = function(){
 		classableNodes.create( 'STRONG', [ 'class--a' ] );
 		classableNodes.create( 'EM', [ 'class--b' ] );
 		classableNodes.create( 'H1', [ 'class--c' ] );
+		classableNodes.create( 'A', [ 'button' ] );
+		
+		insertableNodes.create( 'A', { textContent: 'My Link', href: '#' } );
+		insertableNodes.create( 'IMG', { src: 'http://placehold.it/200x200', alt: 'Placeholder' } );
 		
 		wrapper.classList.add( 'plugins-wysiwyg' );
 		tools.classList.add( 'plugins-wysiwyg-toolbar' );
