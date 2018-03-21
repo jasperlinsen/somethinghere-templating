@@ -84,7 +84,9 @@ plugins.wysiwyg = function(){
 			
 			}
 			function check(){
-			
+				
+				// Still work to do here
+				
 				var { anchorNode, focusNode, anchorOffset, focusOffset } = selection;
 			
 				if( 
@@ -99,16 +101,26 @@ plugins.wysiwyg = function(){
 						node: anchorNode.parentNode
 					}
 				
-					domElement.classList.remove( 'disabled' );
+					disable();
 				
 				} else {
 				
 					selected = null;
 				
-					domElement.classList.add( 'disabled' );
+					enable();
 				
 				}
 			
+			}
+			function disable(){
+				
+				domElement.classList.remove( 'disabled' );
+				
+			}
+			function enable(){
+				
+				domElement.classList.add( 'disabled' );
+				
 			}
 			
 			var selected = null;
@@ -116,20 +128,16 @@ plugins.wysiwyg = function(){
 			
 			domElement.classList.add( 'items', 'plugins-wysiwyg-items-insideNode' );
 			
-			return { domElement, create, check };
+			return { domElement, create, check, disable, enable };
 		
 		}();
 		
 		var wrapper = Editor.createElement( 'div' );
 		var tools = Editor.createElement( 'div' );
 		var content = Editor.createElement( 'div' );
-		var commands = { insideNodes };
+		var commands = [ insideNodes ];
 		
-		Object.keys( commands ).forEach(key => {
-			
-			tools.appendChild( commands[ key ].domElement );
-			
-		});
+		commands.forEach( command => tools.appendChild( command.domElement ) );
 		
 		insideNodes.create( 'STRONG', 'Bold' );
 		insideNodes.create( 'EM', 'Italic' );
@@ -143,11 +151,22 @@ plugins.wysiwyg = function(){
 		
 		document.addEventListener( 'selectionchange', event => {
 			
-			if( document.activeElement === content ){
-				
-				Object.keys( commands ).forEach( key => commands[key].check() );
+			var contentInFocus = document.activeElement === content;
 			
-			}
+			commands.forEach(command => {
+				
+				if( contentInFocus ){
+				
+					command.check()
+				
+				} else {
+					
+					command.disable();
+					
+				}
+				
+			});
+			
 			
 		});
 		content.addEventListener( 'input', update );
