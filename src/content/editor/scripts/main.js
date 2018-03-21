@@ -290,11 +290,28 @@ function save( data ){
 	});
 	
 }
+function clamp( value, min, max ){
+	
+	return value < min ? min : (value > max ? max : value);
+	
+}
 
+function get_json_predefined_path( path ){
+	
+	return json.meta.predefined[ path.replace( '.data.', '' ).replace( /[0-9\[\]]+/gi, '' ) ];
+	
+}
 function make_json_string( data, path ){
 	
 	var input = document.createElement( 'input' );
-	var predefined = json.meta.predefined[ path.replace( '.data.', '' ).replace( /[0-9\[\]]+/gi, '' ) ];
+	var predefined = get_json_predefined_path( path );
+	
+	if( predefined === null ){
+		
+		// Do not display this text
+		return;
+		
+	}
 	
 	if( typeof predefined === 'object' ){
 		
@@ -345,13 +362,20 @@ function make_json_string( data, path ){
 function make_json_boolean( data, path ){
 	
 	var input = document.createElement( 'input' );
-	var predefined = json.meta.predefined[ path.replace( '.data.', '' ).replace( /\[[0-9]\]/gi, '[]' ) ];
+	var predefined = get_json_predefined_path( path );
 	
-	if( predefined === null ) return null;
+	if( predefined === null ){
+		
+		// Do not display this boolean
+		return;
+		
+	}
 	
 	input.type = 'checkbox';
 	input.value = data;
 	input.name = path;
+	input.checked = !!data;
+	input.addEventListener( 'change', e => input.value = input.checked );
 	input.addEventListener( 'change', event_change_input )
 	
 	return input;
@@ -360,9 +384,14 @@ function make_json_boolean( data, path ){
 function make_json_number( data, path ){
 	
 	var input = document.createElement( 'input' );
-	var predefined = json.meta.predefined[ path.replace( '.data.', '' ).replace( /\[[0-9]\]/gi, '[]' ) ];
+	var predefined = get_json_predefined_path( path );
 	
-	if( predefined === null ) return null;
+	if( predefined === null ){
+		
+		// Do not display this number
+		return;
+		
+	}
 	
 	input.type = 'number';
 	input.value = data;
@@ -374,11 +403,15 @@ function make_json_number( data, path ){
 }
 function make_json_array( data, path, parent ){
 
-	var arrayEditable = json.meta.predefined[ path.replace( '.data.', '' ).replace( /\[[0-9]\]/gi, '[]' ) ];
-	
-	if( arrayEditable === null ) return null;
-	
+	var predefined = get_json_predefined_path( path );
 	var array = document.createElement( 'div' );
+	
+	if( predefined === null ){
+		
+		// Do not display this object
+		return;
+		
+	}
 	
 	array.setAttribute( 'name', path );
 	array.setAttribute( 'type', 'array' );
@@ -386,50 +419,95 @@ function make_json_array( data, path, parent ){
 	
 	data.forEach(( item, index ) => {
 		
-		let p = `${path}[${index}]`;
-		let predefined = json.meta.predefined[ p.replace( '.data.', '' ).replace( /\[[0-9]\]/gi, '[]' ) ];
-	
-		if( predefined === null ) return null;
+		let _path = `${path}[${index}]`;
+		let _predefined = get_json_predefined_path( _path );
+		let _name = nameStorage.get( item ) || nameStorage.set( item, _path ).get( item );
 		
 		let label = document.createElement( 'label' );
-		label.textContent = index;
-	
-		label.addEventListener( 'click', event => {
+		let items = document.createElement( 'ul' );
+		let labelContent = document.createElement( 'strong' );
+		
+		items.classList.add( 'items' );
+		
+		labelContent.textContent = _name;
+		labelContent.addEventListener( 'click', event => {
 		
 			label.classList.toggle( 'expand' );
 		
-		})
+		});
+		
+		label.appendChild( labelContent );
+		label.appendChild( items );
+		
 		array.appendChild( label );
 		
-		let s = make_json_editor( item, array, p );
+		let node = make_json_editor( item, array, _path );
 		
-		if( arrayEditable ){
+		if( predefined ){
 			
-			let remove = document.createElement( 'input' );
-			remove.type = 'button';
-			remove.value = 'remove';
-			remove.addEventListener('click', e => {
+			let remove = document.createElement( 'li' );
+			let removeBTN = document.createElement( 'a' );
+			
+			let moveup = document.createElement( 'li' );
+			let moveupBTN = document.createElement( 'a' );
+			
+			let movedown = document.createElement( 'li' );
+			let movedownBTN = document.createElement( 'a' );
+			
+			removeBTN.textContent = 'remove';
+			removeBTN.classList.add( 'remove', 'button' );
+			removeBTN.addEventListener('click', e => {
 				
 				data.splice( index, 1 );
 				array.innerHTML = '';
 				make_json_editor( data, array, path );
 				
-			})
+			});
+
+			moveupBTN.textContent = 'Move up';
+			moveupBTN.classList.add( 'moveup', 'button' );
+			moveupBTN.addEventListener('click', e => {
+				
+				data.splice( index, 1 );
+				data.splice( clamp( index - 1, 0, data.length - 1 ), 0, item );
+				
+				array.innerHTML = '';
+				make_json_editor( data, array, path );
+				
+			});
 			
-			s.appendChild( remove );
+			movedownBTN.textContent = 'Move down';
+			movedownBTN.classList.add( 'movedown', 'button' );
+			movedownBTN.addEventListener('click', e => {
+				
+				console.log( data.splice( index, 1 ) );
+				data.splice( clamp( index, 0, data.length - 1 ), 0, item );
+				
+				array.innerHTML = '';
+				make_json_editor( data, array, path );
+				
+			});
+			
+			remove.appendChild( removeBTN );			
+			moveup.appendChild( moveupBTN );
+			movedown.appendChild( movedownBTN );
+			
+			items.appendChild( remove );
+			items.appendChild( moveup );
+			items.appendChild( movedown );
 			
 		}
 		
 	});
 	
-	if( arrayEditable ){
+	if( predefined ){
 	
 		let add = document.createElement( 'input' );
 		add.type = 'button';
 		add.value = 'add';
 		add.addEventListener('click', e => {
 			
-			data.push( clone_object( arrayEditable ) );
+			data.push( clone_object( predefined ) );
 			array.innerHTML = '';
 			make_json_editor( data, array, path );
 			
@@ -444,30 +522,49 @@ function make_json_array( data, path, parent ){
 }
 function make_json_object( data, path, parent ){
 	
+	// Using object.assign will ensure no keys are forgotten, even if they get added later by the predefined
+	
 	var object = document.createElement( 'div' );
+	var predefined = get_json_predefined_path( path );
+	var _data = Object.assign( {}, predefined, data );
+	
+	if( predefined === null ){
+		
+		// Do not display this object
+		return;
+		
+	}
 	
 	object.setAttribute( 'name', path );
 	object.setAttribute( 'type', 'object' );
 	object.addEventListener( 'click', event_click_toggle_expand );
 	
-	Object.keys( data ).forEach(key => {
+	Object.keys( _data ).forEach(key => {
 	
-		let p = `${path}.${key}`;
-		let predefined = json.meta.predefined[ p.replace( '.data.', '' ).replace( /\[[0-9]\]/gi, '[]' ) ];
-	
-		if( predefined === null ) return null;
-	
-		let label = document.createElement( 'label' );
-		label.textContent = key;
+		let _path = `${path}.${key}`;
+		let _predefined = get_json_predefined_path( _path );
 		
-		label.addEventListener( 'click', event => {
+		if( _predefined === null ){
+			
+			// Do not display this object
+			return;
+			
+		}
+		
+		let label = document.createElement( 'label' );
+		let labelContent = document.createElement( 'strong' );
+		
+		labelContent.textContent = key;
+		labelContent.addEventListener( 'click', event => {
 			
 			label.classList.toggle( 'expand' );
 			
-		})
+		});
+		
+		label.appendChild( labelContent );
 		object.appendChild( label );
 		
-		let s = make_json_editor( data[ key ], object, p );
+		let s = make_json_editor( _data[ key ], object, _path );
 		
 	});
 	
@@ -476,17 +573,22 @@ function make_json_object( data, path, parent ){
 }
 function make_json_editor( data, parent, path = '' ){
 	
-	var predefined = json.meta.predefined[ path.replace( '.data.', '' ).replace( /\[[0-9]\]/gi, '[]' ) ];
+	var predefined = get_json_predefined_path( path )
 	
 	if( predefined === null || data === null ) return null;
 	
-	if( typeof data === 'string' ){
+	if( 
+		typeof data === 'boolean' 
+		|| (typeof data === 'string' && (data === 'true' || data === 'false'))
+	){
 		
-		item = make_json_string( data, path );
-		
-	} else if( typeof data === 'boolean' ){
+		data = typeof data === 'boolean' ? data : !!(data === 'true');
 		
 		item = make_json_boolean( data, path );
+		
+	} else if( typeof data === 'string' ){
+		
+		item = make_json_string( data, path );
 		
 	} else if( typeof data === 'number' ){
 		
@@ -620,3 +722,6 @@ function event_save( event ){
 	});
 	
 }
+
+const nameStorage = new WeakMap;
+const stripArrayRegex = /[0-9\[\]]+/gi;

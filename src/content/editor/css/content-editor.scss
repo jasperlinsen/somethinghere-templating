@@ -1,5 +1,15 @@
 @import 'definitions';
 
+%checkmark {
+	
+	background-image: svg-process('<svg width="100%" height="100%" viewBox="0 0 1 1" version="1.1" xmlns="http://www.w3.org/2000/svg">',
+		'<g id="group">',
+			'<path d="M .2 .5 L .5 .8 L .8 .2" stroke="#{color( bg )}" stroke-width=".2" fill="none" />',
+		'</g>',
+	'</svg>');
+	
+}
+
 * {
 
 	box-sizing: border-box;
@@ -18,11 +28,15 @@ body {
 }
 label {
 	
+	width: 100%;
+	display: flex;
 	color: #666;
 	padding: 10px 0;
 	font-size: .8em;
+	justify-content: space-between;
+	align-items: center;
 	
-	&:before {
+	strong:before {
 		
 		content: '';
 		display: inline-block;
@@ -58,7 +72,7 @@ label {
 	
 	&.expand {
 		
-		&:before {
+		strong:before {
 		
 			transform: rotateZ( 90deg );
 			
@@ -132,7 +146,27 @@ input[type="button"]{
 	}
 	
 }
-label,
+input[type="checkbox"]{
+
+	@extend %checkmark;
+	
+	background-size: 60% auto;
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	
+	width: 2em;
+	height: 2em;
+	border: 1px solid color( background );
+	opacity: .2;
+	
+	&:checked {
+		
+		background-color: color( primary );
+		opacity: 1;
+		
+	}
+	
+}
 [type="array"],
 [type="object"] {
 	
@@ -237,11 +271,7 @@ main {
 		
 		&--success:after {
 			
-			background-image: svg-process('<svg width="100%" height="100%" viewBox="0 0 1 1" version="1.1" xmlns="http://www.w3.org/2000/svg">',
-				'<g id="group">',
-					'<path d="M .2 .5 L .5 .8 L .8 .2" stroke="#{color( bg )}" stroke-width=".2" fill="none" />',
-				'</g>',
-			'</svg>');
+			@extend %checkmark;
 			
 		}
 		
@@ -286,6 +316,13 @@ main {
 		&.active {
 			
 			background: color( primary );
+			color: #000;
+		
+		}
+		
+		&:hover {
+			
+			background: color( secondary );
 			color: #000;
 		
 		}

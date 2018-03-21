@@ -9,7 +9,8 @@
 			},
 			"content.list":{
 				"title":"A Link",
-				"link": "#"
+				"link": "#",
+				"display": true
 			}
 		}
 	},
