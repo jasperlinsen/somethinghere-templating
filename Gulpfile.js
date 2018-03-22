@@ -270,7 +270,9 @@ function gulp_editorServer(){
 		
 		// Update listing of all files saved at the out locations
 		
-		let directories = [].concat( ...paths.content.in.filter( i => i !== out ), out );
+		let directories = paths.content.in.map(i => paths.io.in + i).filter( i => i !== out );
+		
+		directories.push( out );
 		
 		allTemplates = fs.readdirSync( templates ).filter(file => {
 		

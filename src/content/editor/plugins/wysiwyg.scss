@@ -4,12 +4,26 @@
 	margin: 0px auto;
 	border: 1px solid color( background );
 	position: relative;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 	
-	&-popup {
+	&-overlay, &-popup {
 		
 		position: absolute;
 		left: 0;
 		top: 0;
+		
+	}
+	
+	&-overlay {
+	
+		width: 100% !important;
+		height: 100% !important;
+		pointer-events: none;
+		
+	}
+	
+	&-popup {
+		
 		width: 100%;
 		height: 100%;
 		background: rgba(#fff, .75);
@@ -47,12 +61,10 @@
 	
 	&-toolbar-group {
 		
-		$color: #666;
-		$background: linear-gradient( #ececec, #ddd );
+		$background: rgba( #fff, .2 );
 		
 		display: flex;
 		width: auto;
-		border: 1px solid $color;
 		margin: .25em;
 		overflow: hidden;
 		border-radius: .2em;
@@ -67,6 +79,8 @@
 			-webkit-appearance: none;
 			appearance: none;
 			background-position: right 10px top 50%;
+			background-color: $background;
+			color: #fff;
 			
 		}
 		
@@ -77,7 +91,7 @@
 			position: relative;
 			color: transparent;
 			overflow: hidden;
-			border-left: 1px solid $color;
+			border-left: 1px solid black;
 			overflow: hidden;
 			
 			a, &:before{
@@ -86,6 +100,7 @@
 				left: 50%;
 				top: 50%;
 				transform: translate(-50%,-50%);
+				color: #fff;
 				
 			}
 			
@@ -96,54 +111,49 @@
 				width: 100%;
 				height: 100%;
 				box-sizing: border-box;
-				box-shadow: inset 3px 3px 5px rgba( #000, .2 );
-				transition: box-shadow .4s;
+				background: transparent;
 				
 			}
 			
 			&.active {
 				
-				background: $color;
+				background: color( primary );
 				
-				a {
-					
-					box-shadow: inset 3px 3px 5px rgba( #000, .2 );
-			
-				}
-			
 				&:before {
-				
-					color: #fff;
-				
+					
+					color: #000;
+					
 				}
 			
 			}
 			
 			&:hover {
 				
-				a {
-				
-					box-shadow: inset -3px -3px 5px rgba( #000, .2 );
+				background: darken( color( primary ), 20 );
+			
+			}
+			
+			$keys: (
+				"STRONG": ( content: "B", font-weight: bold ),
+				"EM": ( content: "I", font-style: italic, font-family: serif ),
+				"SPAN": ( content: "()" ),
+				"A": ( content: "A" ),
+				"IMG": ( content: "[]" )
+			);
+			
+			@each $key, $content in $keys {
+			
+				&[name="#{$key}"]:before {
+					
+					@each $attr, $prop in $content {
+						
+						#{$attr}: $prop;
+					
+					}
 				
 				}
 			
 			}
-			
-			&:first-child {
-				
-				border-left: 0;
-				
-			}
-			
-			&:before {
-				
-				color: $color;
-				
-			}
-			
-			&[name="STRONG"]:before { content: 'B'; }
-			&[name="EM"]:before { content: 'I'; }
-			&[name="SPAN"]:before { content: '()'; }
 			
 		}
 		

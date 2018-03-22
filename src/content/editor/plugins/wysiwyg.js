@@ -5,6 +5,23 @@ plugins.wysiwyg = function(){
 	
 	return function( data, Editor ){
 		
+		function findNearestTag( node, tagName = 'any' ){
+			
+			var nearest = node;
+			
+			if( tagName === 'any' ){
+				
+				while( nearest && !nearest.tagName ) nearest = nearest.parentNode;
+				
+			} else{
+				
+				while( nearest && nearest.tagName !== tagName ) nearest = nearest.parentNode;
+				
+			}
+			
+			return nearest;
+			
+		}
 		function createButton( face ){
 			
 			var button = Editor.createElement( 'li' );
@@ -18,7 +35,7 @@ plugins.wysiwyg = function(){
 			
 		}
 		
-		const insideNodes = function(){
+		const textNodes = function(){
 			
 			function clickHandlerConstructor( _tagName ){
 				
@@ -120,12 +137,16 @@ plugins.wysiwyg = function(){
 						node: anchorNode.parentNode
 					};
 					
+					overlay.set( textNodes, selected.node, overlayColor );
+					
 					active();
 					enable();
 				
 				} else {
 				
 					selected = null;
+					
+					overlay.set( textNodes, [], overlayColor );
 					
 					active();
 					disable();
@@ -163,16 +184,21 @@ plugins.wysiwyg = function(){
 			
 			var selected = null;
 			var domElement = Editor.createElement( 'ul' );
+			var overlayColor = 'rgba(0,0,0,.2)';
 			
 			domElement.classList.add(
 				'plugins-wysiwyg-toolbar-group',
 				'plugins-wysiwyg-items-insideNode'
 			);
 			
-			return { domElement, create, check, disable, enable };
+			return {
+				domElement, create, check, disable, enable,
+				set overlayColor( color ){ return overlayColor = color; },
+				get overlayColor(){ return overlayColor; }
+			};
 		
 		}();
-		const classableNodes = function(){
+		const classNodes = function(){
 			
 			// TODO: Make it so you can have multiple classes per option
 			// AKA `button primary` will check for both classNames (otherwise classList breaks!)
@@ -264,6 +290,7 @@ plugins.wysiwyg = function(){
 			var selected = null;
 			var domElement = Editor.createElement( 'div' );
 			var selectElement = Editor.createElement( 'select' );
+			var overlayColor = 'rgba(0,0,255,.2)';
 			
 			domElement.appendChild( selectElement );
 			domElement.classList.add(
@@ -295,10 +322,14 @@ plugins.wysiwyg = function(){
 			
 			disable();
 			
-			return { domElement, create, check, disable, enable };
+			return {
+				domElement, create, check, disable, enable,
+				set overlayColor( color ){ return overlayColor = color; },
+				get overlayColor(){ return overlayColor; }
+			};
 		
 		}();
-		const insertableNodes = function(){
+		const blockNodes = function(){
 			
 			function setAttributes( attributes, element ){
 			
@@ -382,8 +413,8 @@ plugins.wysiwyg = function(){
 						/* Insert to where the text selection was. Remove the selected text as it is now inside the node. */
 						
 						setAttributes( attributes, element );
-						
-						node.innerHTML = node.innerHTML.slice( 0, start ) + element.outerHTML + node.innerHTML.slice( end );
+				
+						document.execCommand( 'insertHTML', false, element.outerHTML );
 						
 					});
 					
@@ -493,12 +524,12 @@ plugins.wysiwyg = function(){
 				
 				if( singleNode ){
 					
-					let _selected = anchorNode.parentNode;
+					let _selectedAnchor = anchorNode;
 					let all = Object.keys( list );
 					
-					while( _selected && all.indexOf( _selected.tagName ) < 0 ){
+					while( _selectedAnchor && all.indexOf( _selectedAnchor.tagName ) < 0 ){
 						
-						_selected = _selected.parentNode;
+						_selectedAnchor = _selectedAnchor.parentNode;
 						
 					}
 					
@@ -506,7 +537,7 @@ plugins.wysiwyg = function(){
 						start: Math.min( anchorOffset, focusOffset ),
 						end: Math.max( anchorOffset, focusOffset ),
 						node: anchorNode.parentNode,
-						top: _selected,
+						top: _selectedAnchor,
 						text: selection.toString()
 					};
 					
@@ -525,6 +556,31 @@ plugins.wysiwyg = function(){
 				
 				// Implement that the correct buttons are set to enabled or disabled. Depending on context
 				
+				if( selected.top ){
+					
+					[ ...domElement.childNodes ].forEach(button => {
+						
+						let tagName = button.getAttribute( 'name' );
+						
+						if( tagName === selected.top.tagName ){
+							
+							button.classList.add( 'active', 'edit' );
+							
+						} else {
+							
+							button.classList.remove( 'active', 'edit' );
+							
+						}
+						
+					});
+					
+				} else if( selected.node ){
+					
+					
+					
+				}
+				
+				
 			}
 			function disable(){
 				
@@ -540,37 +596,126 @@ plugins.wysiwyg = function(){
 			var list = {};
 			var selected = null;
 			var domElement = Editor.createElement( 'div' );
+			var overlayColor = 'rgba(0,255,0,.2)';
 			
 			domElement.classList.add(
 				'plugins-wysiwyg-toolbar-group',
 				'plugins-wysiwyg-items-insertableNodes'
 			);
 			
-			return { domElement, create, check, disable, enable };
+			return {
+				domElement, create, check, disable, enable,
+				set overlayColor( color ){ return overlayColor = color; },
+				get overlayColor(){ return overlayColor; }
+			};
 		
 		}();
+		const overlay = function(){
+			
+			function set( command, nodes = [], color = '#000' ){
+				
+				nodes = (nodes instanceof Array ? nodes : [ nodes ]).map(node => {
+				
+					return findNearestTag( node ) || node;
+					
+				});
+				
+				selections.set( command, { nodes, color });
+				
+			}
+			function draw(){
+				
+				// Make sure the wrapper is in view, otherwise drawing is useless.
+				
+				var wrapperBB = wrapper.getBoundingClientRect();
+				
+				if( wrapperBB.top > innerHeight || wrapperBB.bottom < 0 ){
+					
+					return;
+					
+				}
+				
+				domElement.width = domElement.clientWidth;
+				domElement.height = domElement.clientHeight;
+				
+				ctx.font = fontSize + 'px sans-serif';
+				ctx.textBaseline = 'top';
+				ctx.textAlign = 'left';
+				
+				var bb = domElement.getBoundingClientRect();
+				var frame = iframe.getBoundingClientRect();
+				
+				selections.forEach(data => {
+					
+					var { nodes, color } = data;
+					
+					nodes.forEach(node => {
+						
+						var text = node.tagName + (node.className ? `.${node.className}` : '');
+						
+						var textWidth = ctx.measureText( text ).width;
+						var { left, top, width, height } = node.getBoundingClientRect();
+						
+						left = left + frame.left - bb.left;
+						top = top + frame.top - bb.top;
+						
+						ctx.fillStyle = color;
+						ctx.fillRect( left, top, textWidth + 4, fontSize + 4 );
+						
+						ctx.strokeStyle = color;
+						ctx.strokeRect( left, top, width, height );
+						
+						ctx.fillStyle = '#fff';
+						ctx.fillText( text, left + 2, top + 2 );
+						
+					});
+					
+				});
+				
+			}
+			
+			var domElement = Editor.createElement( 'canvas' );
+			var ctx = domElement.getContext( '2d' );
+			var selections = new Map;
+			var fontSize = 10;
+			
+			domElement.classList.add( 'plugins-wysiwyg-overlay' );
+			
+			// Replace with better AF later!
+			setInterval( draw, 1000 / 60 );
+			
+			return {
+				set,
+				domElement,
+				set fontSize( f ){ return fontSize = f; },
+				get fontSize(){ return fontSize; }
+			}
+			
+		}()
 		
 		var iframe = Editor.createElement( 'iframe' );
 		var wrapper = Editor.createElement( 'div' );
 		var tools = Editor.createElement( 'div' );
 		var content = Editor.createElement( 'div' );
-		var commands = [ insideNodes, classableNodes, insertableNodes ];
+		var commands = [ textNodes, classNodes, blockNodes ];
 		var selection;
 		var update;
+		var document;
+		var body;
 		
 		commands.forEach( command => tools.appendChild( command.domElement ) );
 		
-		insideNodes.create( 'STRONG', 'Bold' );
-		insideNodes.create( 'EM', 'Italic' );
-		insideNodes.create( 'SPAN', 'Span' );
+		textNodes.create( 'STRONG', 'Bold' );
+		textNodes.create( 'EM', 'Italic' );
+		textNodes.create( 'SPAN', 'Span' );
 		
-		classableNodes.create( 'STRONG', [ 'class--a' ] );
-		classableNodes.create( 'EM', [ 'class--b' ] );
-		classableNodes.create( 'H1', [ 'class--c' ] );
-		classableNodes.create( 'A', [ 'button' ] );
+		classNodes.create( 'STRONG', [ 'class--a' ] );
+		classNodes.create( 'EM', [ 'class--b' ] );
+		classNodes.create( 'H1', [ 'class--c' ] );
+		classNodes.create( 'A', [ 'button' ] );
 		
-		insertableNodes.create( 'A', { textContent: 'My Link', href: '#' } );
-		insertableNodes.create( 'IMG', { src: 'http://placehold.it/200x200', alt: 'Placeholder' } );
+		blockNodes.create( 'A', { textContent: 'My Link', href: '#' } );
+		blockNodes.create( 'IMG', { src: 'http://placehold.it/200x200', alt: 'Placeholder' } );
 		
 		wrapper.classList.add( 'plugins-wysiwyg' );
 		tools.classList.add( 'plugins-wysiwyg-toolbar' );
@@ -580,8 +725,8 @@ plugins.wysiwyg = function(){
 		iframe.srcdoc = data;
 		iframe.addEventListener( 'load', event => {
 			
-			var document = iframe.contentDocument;
-			var body = document.body;
+			document = iframe.contentDocument;
+			body = document.body;
 			
 			update = function(){
 				
@@ -608,6 +753,7 @@ plugins.wysiwyg = function(){
 		
 		wrapper.appendChild( tools );
 		wrapper.appendChild( iframe );
+		wrapper.appendChild( overlay.domElement );
 	
 		return wrapper;
 	
