@@ -200,9 +200,6 @@ plugins.wysiwyg = function(){
 		}();
 		const classNodes = function(){
 			
-			// TODO: Make it so you can have multiple classes per option
-			// AKA `button primary` will check for both classNames (otherwise classList breaks!)
-			
 			function create( tagName, classList ){
 				
 				list[ tagName.toUpperCase() ] = classList;
@@ -705,13 +702,20 @@ plugins.wysiwyg = function(){
 		
 		commands.forEach( command => tools.appendChild( command.domElement ) );
 		
+			
+		// TODO:  CLassNodes: Make it so you can have multiple classes per option
+		//     AKA `button primary` will check for both classNames (otherwise classList breaks!)
+		
+		// Command definitions need to be done dynamically somehow!
+		// Adding the chosen stylesheet.
+		
 		textNodes.create( 'STRONG', 'Bold' );
 		textNodes.create( 'EM', 'Italic' );
 		textNodes.create( 'SPAN', 'Span' );
 		
-		classNodes.create( 'STRONG', [ 'class--a' ] );
-		classNodes.create( 'EM', [ 'class--b' ] );
-		classNodes.create( 'H1', [ 'class--c' ] );
+		classNodes.create( 'STRONG', [ 'red', 'green', 'blue' ] );
+		classNodes.create( 'EM', [ 'red', 'green', 'blue' ] );
+		classNodes.create( 'H1', [ 'red', 'green', 'blue' ] );
 		classNodes.create( 'A', [ 'button' ] );
 		
 		blockNodes.create( 'A', { textContent: 'My Link', href: '#' } );
