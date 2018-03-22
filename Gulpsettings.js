@@ -8,7 +8,7 @@ const SAVESERVER = {
 const SYNCSERVER = {
 	port: 3000,
 	uiport: 3001,
-	root: './dist/'
+	root: './'
 };
 const EDITOR = {
 	port: 3003,

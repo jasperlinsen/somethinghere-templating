@@ -149,9 +149,13 @@ function gulp_syncServer(){
 	
 	var browsersync = browserSync.create();
 	
+	var baseDir = settings.mode === settings.MODE_DEVELOPMENT
+		? paths.io.out.dev + settings.SYNCSERVER.root
+		: paths.io.out.prd + settings.SYNCSERVER.root;
+		
 	browsersync.init({
 		server: {
-			baseDir: settings.SYNCSERVER.root,
+			baseDir,
 			ui: settings.SYNCSERVER.uiport,
 			port: settings.SYNCSERVER.port
 		},
@@ -257,7 +261,7 @@ function gulp_editorServer(){
 	function compass( callback = () => {} ){
 		
 		// Compile CSS file into a hidden temporary directory
-		gulp_task_css( [ src + 'css/**/*.scss' ], [ tmp ] );
+		gulp_task_css( [ src + 'css/**/*.scss' ], [ tmp ], false );
 		
 		callback();
 		
@@ -644,7 +648,16 @@ function gulp_editorServer(){
 
 // Sub Task Runners
 
-function gulp_task_css( IN = paths.css.in, OUT = paths.css.out ){
+function gulp_task_css( IN = paths.css.in, OUT = paths.css.out, useIO = true ){
+	
+	IN = useIO 
+		? IN.map(path => paths.io.in + path) 
+		: IN;
+	OUT = useIO 
+		? (settings.mode === settings.MODE_DEVELOPMENT
+			? OUT.map(path => paths.io.out.dev + path)
+			: OUT.map(path => paths.io.out.prd + path)
+		) : OUT;
 	
 	return IN.map((path, index) => {
 	
@@ -677,7 +690,16 @@ function gulp_task_css( IN = paths.css.in, OUT = paths.css.out ){
 	});
 	
 }
-function gulp_task_scripts( IN = paths.scripts.in, OUT = paths.scripts.out ){
+function gulp_task_scripts( IN = paths.scripts.in, OUT = paths.scripts.out, useIO = true ){
+	
+	IN = useIO 
+		? IN.map(path => paths.io.in + path) 
+		: IN;
+	OUT = useIO 
+		? (settings.mode === settings.MODE_DEVELOPMENT
+			? OUT.map(path => paths.io.out.dev + path)
+			: OUT.map(path => paths.io.out.prd + path)
+		) : OUT;
 	
 	return IN.map(( path, index ) => {
 		
@@ -711,7 +733,16 @@ function gulp_task_scripts( IN = paths.scripts.in, OUT = paths.scripts.out ){
 	});
 	
 }
-function gulp_task_content( IN = paths.content.in, OUT = paths.content.out ){
+function gulp_task_content( IN = paths.content.in, OUT = paths.content.out, useIO = true ){
+	
+	IN = useIO 
+		? IN.map(path => paths.io.in + path) 
+		: IN;
+	OUT = useIO 
+		? (settings.mode === settings.MODE_DEVELOPMENT
+			? OUT.map(path => paths.io.out.dev + path)
+			: OUT.map(path => paths.io.out.prd + path)
+		) : OUT;
 	
 	var selfReferencePathRegex = /\/.\//g;
 	
@@ -799,7 +830,16 @@ function gulp_task_content( IN = paths.content.in, OUT = paths.content.out ){
 	});
 	
 }
-function gulp_task_files( IN = paths.files.in, OUT = paths.files.out ){
+function gulp_task_files( IN = paths.files.in, OUT = paths.files.out, useIO = true ){
+	
+	IN = useIO 
+		? IN.map(path => paths.io.in + path) 
+		: IN;
+	OUT = useIO 
+		? (settings.mode === settings.MODE_DEVELOPMENT
+			? OUT.map(path => paths.io.out.dev + path)
+			: OUT.map(path => paths.io.out.prd + path)
+		) : OUT;
 		
 	return IN.map((path, index) => {
 		
@@ -812,7 +852,16 @@ function gulp_task_files( IN = paths.files.in, OUT = paths.files.out ){
 	});
 	
 }
-function gulp_task_icons( IN = paths.icons.in, OUT = paths.icons.out ){
+function gulp_task_icons( IN = paths.icons.in, OUT = paths.icons.out, useIO = true ){
+	
+	IN = useIO 
+		? IN.map(path => paths.io.in + path) 
+		: IN;
+	OUT = useIO 
+		? (settings.mode === settings.MODE_DEVELOPMENT
+			? OUT.map(path => paths.io.out.dev + path)
+			: OUT.map(path => paths.io.out.prd + path)
+		) : OUT;
 	
 	return IN.forEach((path, index, array) => {
 		
@@ -886,11 +935,14 @@ function gulp_task_watch(){
 	
 	var bs = gulp_syncServer();
 	var save = gulp_saveServer();
+	var IN = paths.io.in;
     
-	watch( paths.css.watch, () => gulp.start( 'css', () => bs.reload() ) ),
-	watch( paths.scripts.watch, () => gulp.start( 'scripts', () => bs.reload() ) );
-	watch( paths.content.watch, () => gulp.start( 'content', () => bs.reload() ) );
-	watch( paths.files.watch, () => gulp.start( 'files', () => bs.reload() ) );
+    console.log( IN + paths.css.watch )
+    
+	watch( IN + paths.css.watch, () => gulp.start( 'css', () => bs.reload() ) ),
+	watch( IN + paths.scripts.watch, () => gulp.start( 'scripts', () => bs.reload() ) );
+	watch( IN + paths.content.watch, () => gulp.start( 'content', () => bs.reload() ) );
+	watch( IN + paths.files.watch, () => gulp.start( 'files', () => bs.reload() ) );
 	
 	return [ bs, save ];
 	

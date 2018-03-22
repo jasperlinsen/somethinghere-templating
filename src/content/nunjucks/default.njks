@@ -16,7 +16,7 @@
 <section>
 	
 	<h3>{{item.title}}</h3>
-	<p>{{item.content}}</p>
+	<p>{{item.content|safe}}</p>
 	
 	<ul>
 		{% for listitem in item.list %}

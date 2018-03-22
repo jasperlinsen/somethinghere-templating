@@ -1,64 +1,72 @@
 const excludeFiles = [ '!./**/*.afdesign', '!./**/*.ai', '!./**/*.scss' ];
 
+const io = {
+	in: './src/',
+	out: {
+		prd: './dist/',
+		dev: './dev/'
+	}
+}
 const css = {
 	in: [
-		'./src/css/*.scss'
+		'./css/*.scss'
 	],
 	out: [
-		'./dist/css/'
+		'./css/'
 	],
 	watch: [
-		'./src/css/**/*.scss'
+		'./css/**/*.scss'
 	]
 };
 const scripts = {
 	in: [
-		'./src/scripts/default.js'
+		'./scripts/default.js'
 	],
 	out: [
-		'./dist/scripts/'
+		'./scripts/'
 	],
 	watch: [
-		'./src/scripts/**/*.js'
+		'./scripts/**/*.js'
 	]
 };
 const content = {
 	in: [
-		'./src/content/data/'
+		'./content/data/'
 	],
 	out: [
-		'./dist/',
+		'./',
 	],
 	watch: [
-		'./src/content/data/*.json',
-		'./src/content/templates/**/*.njks'
+		'./content/data/*.json',
+		'./content/nunjucks/**/*.njks',
+		'./content/templates/**/*.json'
 	]
 };
 const files = {
 	in: [
-		[ './src/files/resources/**/*', ...excludeFiles ],
-		[ './src/files/images/**/*', ...excludeFiles  ],
-		[ './src/files/fonts/**/*', ...excludeFiles ]
+		[ './files/resources/**/*', ...excludeFiles ],
+		[ './files/images/**/*', ...excludeFiles  ],
+		[ './files/fonts/**/*', ...excludeFiles ]
 	],
 	out: [
-		'./dist/resources/',
-		'./dist/images/',
-		'./dist/fonts/'
+		'./resources/',
+		'./images/',
+		'./fonts/'
 	],
 	watch: [
-		'./src/files/**/*'
+		'./files/**/*'
 	]
 };
 const icons = {
 	in: [
-		'./src/icons/**.svg'
+		'./icons/**.svg'
 	],
 	out: [
-		'./src/files/fonts/'
+		'./files/fonts/'
 	],
 	watch: [
-		'./src/icons/**.svg'
+		'./icons/**.svg'
 	]
 };
 
-module.exports = { css, scripts, files, content, icons };
+module.exports = { io, css, scripts, files, content, icons };
