@@ -3,7 +3,7 @@ const excludeFiles = [ '!./**/*.afdesign', '!./**/*.ai', '!./**/*.scss' ];
 const io = {
 	in: './src/',
 	out: {
-		prd: './dist/',
+		prd: './prd/',
 		dev: './dev/'
 	}
 }
@@ -62,7 +62,7 @@ const icons = {
 		'./icons/**.svg'
 	],
 	out: [
-		'./files/fonts/'
+		'/files/fonts/'
 	],
 	watch: [
 		'./icons/**.svg'

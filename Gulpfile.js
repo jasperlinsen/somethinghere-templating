@@ -55,6 +55,105 @@ function set_environment( mode ){
 	}
 	
 }
+function prepend_paths( list, prepend ){
+	
+	// Validate any paths
+	// If a path start at root (/), we want it to be the root and no prepending.
+	
+	return list.map(item => {
+		
+		if( item instanceof Array ){
+			
+			return prepend_paths( item, prepend );
+			
+		} else if( typeof item === 'string' ){
+			
+			switch( item[ 0 ] ){
+				
+				case '!':
+					return '!' + prepend + item.slice(1);
+				case '/':
+					return '.' + item;
+				default:
+					return prepend + item;
+			
+			}
+			
+		} else {
+			
+			return false;
+			
+		}
+		
+	}).filter(v => v !== false);
+	
+}
+function gulp_all( IN, OUT, handle, type = false ){
+	
+	return Promise.all( IN.map((path, index, array) => {
+		
+		var out = OUT[ index ] || OUT[ OUT.length - 1 ];
+		
+		return new Promise( resolve => {
+			
+			function end(){
+				
+				console.log( `[V][${type}]: ${path} -> ${out}` );
+		
+				resolve( data.gulp );
+				
+			}
+			function error(){
+				
+				console.log( `[X][${type}]: ${path} -> ${out}` );
+		
+				resolve( data.gulp );
+				
+			}
+			function preventResolve(){
+				
+				gulpDest = false;
+				
+				return { end, error }
+				
+			}
+			function pipe( handler){
+				
+				data.gulp = data.gulp.pipe( handler );
+				
+				return data.gulp;
+				
+			}
+			
+			var gulpDest = true;
+			var data = {
+				gulp: gulp.src( path ),
+				pipe,
+				in: path,
+				out,
+				preventResolve,
+				index,
+				array
+			};
+			
+			pipe( plumber() );
+			
+			handle( data );
+			
+			if( gulpDest ){
+			
+				data.gulp.on( 'end', end );
+				data.gulp.on( 'error', error );
+				
+				pipe( gulp.dest( out ) );
+			
+			}
+		
+		});
+	
+	}) );
+	
+}
 
 // Server Task Runners
 
@@ -652,221 +751,210 @@ function gulp_editorServer(){
 
 function gulp_task_css( IN = paths.css.in, OUT = paths.css.out, useIO = true ){
 	
-	IN = useIO 
-		? IN.map(path => paths.io.in + path) 
-		: IN;
-	OUT = useIO 
-		? (settings.mode === settings.MODE_DEVELOPMENT
-			? OUT.map(path => paths.io.out.dev + path)
-			: OUT.map(path => paths.io.out.prd + path)
-		) : OUT;
+	var path = settings.mode === settings.MODE_DEVELOPMENT ? paths.io.out.dev : paths.io.out.prd;
 	
-	return IN.map((path, index) => {
+	IN = useIO ? prepend_paths( IN, paths.io.in ) : IN;
+	OUT = useIO ? prepend_paths( OUT, path) : OUT;
 	
-		var out = OUT[ index ] || OUT[ OUT.length - 1 ];
+	return gulp_all( IN, OUT, function( gulp ){
 		
-		var g = gulp.src( path ).pipe( plumber() );
-		
-		g = g.pipe( compass({
-			project: fs.realpathSync(__dirname + '/.'),
-			css: out,
-			sass: path.split( '*' )[ 0 ],
+		gulp.pipe( compass({
+			project: fs.realpathSync( __dirname + '/.' ),
+			css: gulp.out,
+			sass: gulp.in.split( '*' )[ 0 ],
 			style: settings.mode === settings.MODE_DEVELOPMENT ? 'nested' : 'compressed'
-		}) ).pipe( rename(
+		}) )
+		
+		gulp.pipe( rename(
 			path => path.extension = '.css'
 		) );
-	
+
 		if( settings.mode === settings.MODE_PRODUCTION ){
-		
-			g = g.pipe( autoprefixer({
+	
+			gulp.pipe( autoprefixer({
 				browsers: ['last 2 versions'],
 				cascade: false
 			}) );
-		
+	
 		}
 		
-		console.log( `[css]: ${path} -> ${out}` );
+		return gulp;
 	
-		return g.pipe( gulp.dest( out ) );
-	
-	});
+	}, 'css');
 	
 }
 function gulp_task_scripts( IN = paths.scripts.in, OUT = paths.scripts.out, useIO = true ){
 	
-	IN = useIO 
-		? IN.map(path => paths.io.in + path) 
-		: IN;
-	OUT = useIO 
-		? (settings.mode === settings.MODE_DEVELOPMENT
-			? OUT.map(path => paths.io.out.dev + path)
-			: OUT.map(path => paths.io.out.prd + path)
-		) : OUT;
+	var path = settings.mode === settings.MODE_DEVELOPMENT ? paths.io.out.dev : paths.io.out.prd;
 	
-	return IN.map(( path, index ) => {
-		
-		var out = OUT[ index ] || OUT[ OUT.length - 1 ];
-		
-		var g = gulp.src( path ).pipe( plumber() );
+	IN = useIO ? prepend_paths( IN, paths.io.in ) : IN;
+	OUT = useIO ? prepend_paths( OUT, path) : OUT;
+	
+	return gulp_all( IN, OUT, function( gulp ){
 		
 		if( settings.mode === settings.MODE_DEVELOPMENT ){
 		
-			g = g.pipe( sourcemaps.init() );
+			gulp.pipe( sourcemaps.init() );
 	
 		}
 	
-		g = g.pipe( browserify() );
+		gulp.pipe( browserify() );
 	
 		if( settings.mode === settings.MODE_DEVELOPMENT ){
 		
-			g = g.pipe( sourcemaps.write() );
+			gulp.pipe( sourcemaps.write() );
 	
 		} else if( settings.mode === settings.MODE_PRODUCTION ){
 	
-			g = g.pipe( babel({ presets: ['env'] }) );
-			g = g.pipe( uglify() );
+			gulp.pipe( babel({ presets: ['env'] }) );
+			gulp.pipe( uglify() );
 	
 		}
 		
-		console.log( `[scripts]: ${path} -> ${out}` );
+		return gulp;
 		
-		return g.pipe( gulp.dest( out ) );
-	
-	});
+	}, 'scripts' );
 	
 }
 function gulp_task_content( IN = paths.content.in, OUT = paths.content.out, useIO = true ){
 	
-	IN = useIO 
-		? IN.map(path => paths.io.in + path) 
-		: IN;
-	OUT = useIO 
-		? (settings.mode === settings.MODE_DEVELOPMENT
-			? OUT.map(path => paths.io.out.dev + path)
-			: OUT.map(path => paths.io.out.prd + path)
-		) : OUT;
-	
-	var selfReferencePathRegex = /\/.\//g;
-	
-	return IN.map(( path, index ) => {
+	function parsePath( path, info ){
 		
-		var out = OUT[ index ] || OUT[ OUT.length - 1 ];
-	
-		function parsePath( path ){
+		var { out } = info;
+		
+		var meta, data;
+		var template;
+		var njksPath;
+		var output;
+		var filePath;
+		var folderPath;
+		
+		return new Promise(function( resolve, reject ){
 			
 			fs.readFile( path, function( err, content ){
-				
-				var meta, data;
-				
+			
 				try {
-					
+				
 					var all = JSON.parse( content );
-					
+				
 					meta = all.meta;
 					data = all.data;
-					
+				
 				} catch( e ){
-					
- 					console.log( `[content][FAIL:JSON] ${path} `);
-					return;
-					
+				
+					return reject();
+				
 				}
-			
-				nunjucks.configure({ noCache: true });
 				
-				var template = JSON.parse( fs.readFileSync( meta.in ) );
-				var njksPath = template.meta.in;
-				
-				var output = nunjucks.render( njksPath, data );
-				var filePath = meta.out.slice( -1 ) == '/'
-					? out + meta.out + 'index.html'
-					: out + meta.out;
-				var folderPath = filePath.split( '/' ).slice( 0, -1 ).join( '/' );
-				
-				filePath = filePath.replace( selfReferencePathRegex, '/' )
-				
-				mkdirp( folderPath, function( err ){
-				
-					fs.writeFile( filePath, output, function( err, done ){
-						
-						if( err ){
-							
-							console.log( `[content][FAIL] ${path} -> ${filePath} `);
-							
-						} else {
-						
-							console.log( `[content] ${path} -> ${filePath} `);
-							
-						}
+				fs.readFile( meta.in, function( err, content ){
 					
-					});
+					if( err ){
+						
+						reject();
+						
+					} else {
+					
+						template = JSON.parse( content );
+						njksPath = template.meta.in;
+						filePath = (meta.out.slice( -1 ) == '/'
+							? out + meta.out + 'index.html'
+							: out + meta.out).replace( selfReferencePathRegex, '/' );
+						folderPath = filePath.split( '/' ).slice( 0, -1 ).join( '/' );
+						
+						output = nunjucks.render( njksPath, data );
+					
+						mkdirp( folderPath, function( err ){
 				
-				});
+							if( err ){
+				
+								reject();
+				
+							} else {
+				
+								fs.writeFile( filePath, output, function( err, done ){
+					
+									if( err ){
+						
+										reject();
+						
+									} else {
+										
+										resolve();
+						
+									}
+				
+								}); // fs.writeFile (output);
+				
+							}
 			
-			})
+						}); // mkdirp
+						
+					}
+					
+				}); // fs.readFile (template.json)
 		
-		}
+			}); // fs.readFile (data.json)
+		
+		}); // Promise
 	
-		fs.readdir( path, function( err, files ){
+	}
+	
+	var selfReferencePathRegex = /\/.\//g;
+	var path = settings.mode === settings.MODE_DEVELOPMENT ? paths.io.out.dev : paths.io.out.prd;
+	
+	IN = useIO ? prepend_paths( IN, paths.io.in ) : IN;
+	OUT = useIO ? prepend_paths( OUT, path) : OUT;
+		
+	nunjucks.configure({ noCache: true });
+	
+	return gulp_all( IN, OUT, function( gulp ){
+		
+		var { end, error } = gulp.preventResolve();
+		
+		fs.readdir( gulp.in, function( err, files ){
 		
 			if( err ){
 			
-				console.log( `[content][FAIL:path] ${path}` );
+				error();
 			
 			} else {
-			
-				files.filter(
+
+				Promise.all( files.filter(
 				
 					filename => (filename.indexOf( '.' ) !== 0 && filename.indexOf( 'json' ) === filename.length - 4)
 					
-				).map(
+				).map(filename => {
+					
+					return parsePath( gulp.in + filename, gulp )
 				
-					filename => (path + filename)
-				
-				).forEach( parsePath );
+				}) ).then( end ).catch( error );
 			
 			}
 		
 		});
-	
-	});
+		
+	}, 'content' );
 	
 }
 function gulp_task_files( IN = paths.files.in, OUT = paths.files.out, useIO = true ){
 	
-	IN = useIO 
-		? IN.map(path => paths.io.in + path) 
-		: IN;
-	OUT = useIO 
-		? (settings.mode === settings.MODE_DEVELOPMENT
-			? OUT.map(path => paths.io.out.dev + path)
-			: OUT.map(path => paths.io.out.prd + path)
-		) : OUT;
-		
-	return IN.map((path, index) => {
-		
-		let out = OUT[ index ] || OUT[ OUT.length - 1 ];
-		
-		console.log( `[files]: ${path} -> ${out}` );
+	var path = settings.mode === settings.MODE_DEVELOPMENT ? paths.io.out.dev : paths.io.out.prd;
 	
-		return gulp.src( path ).pipe( gulp.dest( out ) );
+	IN = useIO ? prepend_paths( IN, paths.io.in ) : IN;
+	OUT = useIO ? prepend_paths( OUT, path) : OUT;
 		
-	});
+	return gulp_all( IN, OUT, function(){}, 'files' );
 	
 }
 function gulp_task_icons( IN = paths.icons.in, OUT = paths.icons.out, useIO = true ){
 	
-	IN = useIO 
-		? IN.map(path => paths.io.in + path) 
-		: IN;
-	OUT = useIO 
-		? (settings.mode === settings.MODE_DEVELOPMENT
-			? OUT.map(path => paths.io.out.dev + path)
-			: OUT.map(path => paths.io.out.prd + path)
-		) : OUT;
+	var path = settings.mode === settings.MODE_DEVELOPMENT ? paths.io.out.dev : paths.io.out.prd;
 	
-	return IN.forEach((path, index, array) => {
-		
+	IN = useIO ? prepend_paths( IN, paths.io.in ) : IN;
+	OUT = useIO ? prepend_paths( OUT, path ) : OUT;
+	
+	return gulp_all( IN, OUT, function( gulp ){
+	
 		function CreateSCSSandCSSFiles( glyphs, options ){
 			
 			var css = `@font-face { font-family: "${options.fontName}"; src: ${options.formats.map(
@@ -908,11 +996,15 @@ function gulp_task_icons( IN = paths.icons.in, OUT = paths.icons.out, useIO = tr
 			
 			scss = scss.replace( /(\t{4})/g, '' );
 			
+			console.log( out + `_${options.fontName}.scss` );
+			
 			fs.writeFileSync( out + `_${options.fontName}.scss`, scss );
 			fs.writeFileSync( out + `${options.fontName}.css`, css );
 			
 		}
 		
+		var { index, array, out } = gulp;
+		var { end, error } = gulp.preventResolve();
 		var i = array.length > 1 ? '-' + (index + 1) : '';
 		var fontSettings = {
 			fontName: 'icons' + i,
@@ -921,13 +1013,14 @@ function gulp_task_icons( IN = paths.icons.in, OUT = paths.icons.out, useIO = tr
 		};
 		var out = OUT[ index ] || OUT[ OUT.length - 1 ];
 		
-		return gulp
-			.src( path )
-			.pipe( iconfont( fontSettings ) )
-			.on( 'glyphs', CreateSCSSandCSSFiles )
-			.pipe( gulp.dest( out ) );
+		return gulp.pipe( iconfont( fontSettings ) ).on( 'glyphs', ( glyphs, options ) => {
+			
+			CreateSCSSandCSSFiles( glyphs, options );
+			end();
 		
-	});
+		});
+		
+	}, 'icons' );
 	
 }
 
@@ -937,14 +1030,21 @@ function gulp_task_watch(){
 	
 	var bs = gulp_syncServer();
 	var save = gulp_saveServer();
-	var IN = paths.io.in;
+	
+	function start( task ){
+		
+		return function(){
+			
+			return gulp.start( task, () => bs.reload() );
+		
+		}
+		
+	}
     
-    console.log( IN + paths.css.watch )
-    
-	watch( IN + paths.css.watch, () => gulp.start( 'css', () => bs.reload() ) ),
-	watch( IN + paths.scripts.watch, () => gulp.start( 'scripts', () => bs.reload() ) );
-	watch( IN + paths.content.watch, () => gulp.start( 'content', () => bs.reload() ) );
-	watch( IN + paths.files.watch, () => gulp.start( 'files', () => bs.reload() ) );
+	watch( prepend_paths( paths.css.watch, paths.io.in ), start( 'css' ) ),
+	watch( prepend_paths( paths.scripts.watch, paths.io.in ), start( 'scripts' ) );
+	watch( prepend_paths( paths.content.watch, paths.io.in ), start( 'content' ) );
+	watch( prepend_paths( paths.files.watch, paths.io.in ), start( 'files' ) );
 	
 	return [ bs, save ];
 	
@@ -1006,26 +1106,24 @@ function gulp_task_development(){
 	
 	set_environment( '--dev' );
 	
-	return [
+	return Promise.all([
 		gulp_task_css(),
 		gulp_task_scripts(),
 		gulp_task_files(),
-		gulp_task_content(),
-		gulp_task_watch()
-	];
+		gulp_task_content()
+	]).then( gulp_task_watch );
 	
 }
 function gulp_task_production(){
 	
 	set_environment( '--prd' );
 	
-	return [
+	return Promise.all([
 		gulp_task_css(),
 		gulp_task_scripts(),
 		gulp_task_files(),
-		gulp_task_content(),
-		gulp_task_watch()
-	];
+		gulp_task_content()
+	]).then( gulp_task_watch );
 	
 }
 function gulp_task_default(){

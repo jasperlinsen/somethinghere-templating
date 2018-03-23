@@ -71,6 +71,10 @@ An array of **file** selection paths. The paths that must be watched for file ch
 
 __Example__ `[ './src/css/**/*.scss' ]`
 
+#### Relative and Absolute Paths
+
+Relative paths can be prepended by paths defined in the io. They must start with `./` (`!` is not part of a path) if you want to use the `--prd` and `--dev` tasks correctly. For absolute output, start your path with `/`, which will be converted internally to point at the root of the repository. This is useful if you want to make sure some output does not get rerouted (like icons, where your input is pointing to `src` and the output is pointing to a different folder in `src` - to prevent the path being interpreted as output to the `dev` folder, you can use the absolute path to prevent this).
+
 ## Gulp Details
 
 ### Scripts
@@ -121,14 +125,14 @@ Icons will generate icon fonts. It will also generate these files:
 
 The best way to include these in your site is to set the `out` to somewhere in a folder that is being watched by the `files` task, which will then copy them over. In your `scss`, be sure to include both the `scss` and an import to the path in the distribution. If, for example, your setup looks like this:
 
-	css.in: src/css/main.scss
-	css.out: dest/css/
+	css.in: ./css/main.scss
+	css.out: ./css/
 	
-	files.in: src/files/fonts/**/*
-	files.out: dist/fonts
+	files.in: ./files/fonts/**/*
+	files.out: ./fonts
 	
-	icons.in: src/icons/**.svg
-	icons.out: src/files/fonts/
+	icons.in: ./icons/**.svg
+	icons.out: /files/fonts/
 
 Then in your `main.scss` file, use the following two lines:
 
