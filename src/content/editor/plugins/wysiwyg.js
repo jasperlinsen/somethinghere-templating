@@ -126,7 +126,7 @@ plugins.wysiwyg = function(){
 				// Still work to do here
 				
 				var { anchorNode, focusNode, anchorOffset, focusOffset } = selection;
-				var singleNode = anchorNode === focusNode;
+				var singleNode = anchorNode && focusNode && anchorNode === focusNode;
 				var isCollapsed = anchorOffset !== focusOffset;
 				
 				if( singleNode && anchorNode.parentNode ){
@@ -216,8 +216,6 @@ plugins.wysiwyg = function(){
 					
 					selected = anchorNode.parentNode;
 					
-					console.log( selected );
-					
 					active();
 					
 				} else if( !singleNode ){
@@ -235,17 +233,22 @@ plugins.wysiwyg = function(){
 					
 					let hasClass = false;
 					
-					list[ selected.tagName.toUpperCase() ].forEach(_class => {
+					list[ selected.tagName.toUpperCase() ].forEach(_classes => {
 						
 						let option = document.createElement( 'option' );
+						let classes = _classes.split( ' ' ).filter(v => v);
 						
-						option.value = _class;
-						option.textContent = _class;
+						option.value = _classes;
+						option.textContent = _classes;
 						
-						if( selected.classList.contains( _class ) ){
+						if( !classes.find(_class => {
+						
+							return !selected.classList.contains( _class )
+							
+						}) ){
 							
 							hasClass = true;
-							option.selected = selected.classList.contains( _class );
+							option.selected = _classes;
 						
 						}
 						
@@ -303,11 +306,19 @@ plugins.wysiwyg = function(){
 					
 					if( _list ){
 						
-						selected.classList.remove( ..._list );
+						_list.forEach( classes => {
+						
+							selected.classList.remove( ...classes.split( ' ' ).filter(v=>v) );
+							
+						})
 						
 						if( selectElement.value ){
 						
-							selected.classList.add( selectElement.value );
+							_list.forEach( classes => {
+						
+								selected.classList.add( ...selectElement.value.split( ' ' ).filter(v=>v) );
+							
+							})
 						
 						}
 					
@@ -694,7 +705,7 @@ plugins.wysiwyg = function(){
 		var wrapper = Editor.createElement( 'div' );
 		var tools = Editor.createElement( 'div' );
 		var content = Editor.createElement( 'div' );
-		var commands = [ textNodes, classNodes, blockNodes ];
+		var commands = [ textNodes, blockNodes, classNodes ];
 		var selection;
 		var update;
 		var document;
@@ -716,7 +727,7 @@ plugins.wysiwyg = function(){
 		classNodes.create( 'STRONG', [ 'red', 'green', 'blue' ] );
 		classNodes.create( 'EM', [ 'red', 'green', 'blue' ] );
 		classNodes.create( 'H1', [ 'red', 'green', 'blue' ] );
-		classNodes.create( 'A', [ 'button' ] );
+		classNodes.create( 'A', [ 'button primary' ] );
 		
 		blockNodes.create( 'A', { textContent: 'My Link', href: '#' } );
 		blockNodes.create( 'IMG', { src: 'http://placehold.it/200x200', alt: 'Placeholder' } );

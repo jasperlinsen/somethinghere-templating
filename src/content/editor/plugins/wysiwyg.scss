@@ -31,14 +31,108 @@
 		
 		> div {
 			
+			@keyframes in {
+				
+				from { transform: translateY(-100%); }
+				to { transform: translateY(0%); }
+				
+			}
+			
 			margin: auto;
 			padding: 20px;
-			background: #fff;
-			box-shadow: 0 0 10px rgba( #000, .5 );
+			background: #000;
+			overflow: auto;
+			max-height: 100%;
+			color: #fff;
+			width: 100%;
+			max-width: 400px;
+			animation: in .2s timing-function( bounce );
+			
+			> div {
+				
+				display: flex;
+				padding-bottom: .5em;
+			
+				&:last-child {
+					
+					padding-top: .5em;
+					padding-bottom: 0;
+					justify-content: space-between;
+				
+				}
+				
+				label {
+					
+					color: #fff;
+					max-width: 50px;
+					overflow: hidden;
+					white-space: nowrap;
+					text-overflow: ellipsis;
+					transition: max-width .4s;
+					position: relative;
+					
+					&:after {
+						
+						content: '';
+						display: block;
+						position: absolute;
+						right: 0;
+						top: 0;
+						height: 100%;
+						width: 3em;
+						background: linear-gradient( -90deg, black, transparent );
+						opacity: 1;
+						transition: opacity .4s;
+						pointer-events: none;
+						
+					}
+					
+					&:hover {
+						
+						max-width: 100px;
+						
+						&:after {
+							
+							opacity: 0;
+							
+						}
+						
+					}
+					
+				}
+				
+				input {
+					
+					appearance: none;
+					display: block;
+					border: 1px solid #ededed;
+					padding: .2em 1em;
+					cursor: pointer;
+					
+					&:focus {
+						
+						outline: none;
+						border-color: color( primary );
+						
+					}
+					
+					&[value="confirm"]{
+						
+						background-color: color( primary );
+						
+					}
+					
+					&[type="button"]:hover{
+						
+						background-color: mix( color( primary ), white, 50 );
+						
+					}
+					
+				}
+				
+			}
 			
 		}
-		
-		* { display: block !important; }
 		
 	}
 	
