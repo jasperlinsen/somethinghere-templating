@@ -1,36 +1,40 @@
-// Node Requirements
+// Require Functions
+// Only require to import dependencies when needed for a task.
 
-const fs = require( 'fs' );
-const http = require('http');
-const path = require( 'path' );
-const spawn = require( 'child_process' ).spawn;
-const browserSync = require( 'browser-sync' );
+const requireAll = function(){
+	
+	var store = {};
+	
+	return function( ...things ){
+		
+		return things.map( string => {
+			
+			return store[ string ] = store[ string ] || require( string )
+			
+		});
+		
+	}
+	
+}();
+const requireGulp = function(){
+	
+	var store = {};
+	
+	return function( ...things ){
+		
+		return things.map( string => {
+			
+			return store[ string ] = store[ string ] || require( 'gulp-' + string )
+			
+		});
+		
+	}
+	
+}();
 
-// Gulp Requirements
+// Essential Dependencies
 
-const gulp = require( 'gulp' );
-const watch = require( 'gulp-watch' );
-const rename = require( 'gulp-rename' );
-const plumber = require( 'gulp-plumber' );
-
-// CSS Requirements
-
-const compass = require( 'gulp-compass' );
-const iconfont = require( 'gulp-iconfont' );
-const autoprefixer = require( 'gulp-autoprefixer' );
-
-// Script Requirements
-
-const babel = require( 'gulp-babel' );
-const jslint = require( 'gulp-jslint' );
-const uglify = require( 'gulp-uglify' );
-const browserify = require( 'gulp-browserify' );
-const sourcemaps = require( 'gulp-sourcemaps' );
-
-// Templating Requirements
-
-const nunjucks = require( 'nunjucks' );
-const mkdirp = require( 'mkdirp' );
+const [ fs, path, gulp ] = requireAll( 'fs', 'path', 'gulp' );
 
 // Settings
 
@@ -90,6 +94,8 @@ function prepend_paths( list, prepend ){
 }
 function gulp_all( IN, OUT, handle, type = false ){
 	
+	var [ plumber ] = requireGulp( 'plumber' );
+	
 	return Promise.all( IN.map((path, index, array) => {
 		
 		var out = OUT[ index ] || OUT[ OUT.length - 1 ];
@@ -117,7 +123,7 @@ function gulp_all( IN, OUT, handle, type = false ){
 				return { end, error }
 				
 			}
-			function pipe( handler){
+			function pipe( handler ){
 				
 				data.gulp = data.gulp.pipe( handler );
 				
@@ -199,6 +205,8 @@ function gulp_saveServer(){
 	
 	}
 	
+	var [ http ] = requireAll( 'http' );
+	
 	return http.createServer(function( req, res ){
 		
 		var [ path, query ] = req.url.split( '?' );
@@ -246,8 +254,8 @@ function gulp_saveServer(){
 }
 function gulp_syncServer(){
 	
+	var [ browserSync ] = requireAll( 'browser-sync' );
 	var browsersync = browserSync.create();
-	
 	var baseDir = settings.mode === settings.MODE_DEVELOPMENT
 		? paths.io.out.dev + settings.SYNCSERVER.root
 		: paths.io.out.prd + settings.SYNCSERVER.root;
@@ -711,6 +719,8 @@ function gulp_editorServer(){
 		
 	}
 	
+	var [ nunjucks, http, mkdirp ] = requireAll( 'nunjucks', 'http', 'mkdirp' );
+	var [ watch ] = requireGulp( 'watch' );
 	var { port, tmp, src, templates, out } = settings.EDITOR;
 	var allTemplates = [];
 	var allFiles = [];
@@ -751,10 +761,15 @@ function gulp_editorServer(){
 
 function gulp_task_css( IN = paths.css.in, OUT = paths.css.out, useIO = true ){
 	
+	var [
+		compass, autoprefixer, sourcemaps, rename
+	] = requireGulp(
+		'compass', 'autoprefixer', 'sourcemaps', 'rename'
+	);
 	var path = settings.mode === settings.MODE_DEVELOPMENT ? paths.io.out.dev : paths.io.out.prd;
 	
 	IN = useIO ? prepend_paths( IN, paths.io.in ) : IN;
-	OUT = useIO ? prepend_paths( OUT, path) : OUT;
+	OUT = useIO ? prepend_paths( OUT, path ) : OUT;
 	
 	return gulp_all( IN, OUT, function( gulp ){
 		
@@ -785,6 +800,11 @@ function gulp_task_css( IN = paths.css.in, OUT = paths.css.out, useIO = true ){
 }
 function gulp_task_scripts( IN = paths.scripts.in, OUT = paths.scripts.out, useIO = true ){
 	
+	var [
+		babel, jslint, uglify, browserify, sourcemaps
+	] = requireGulp(
+		'babel', 'jslint', 'uglify', 'browserify', 'sourcemaps'
+	);
 	var path = settings.mode === settings.MODE_DEVELOPMENT ? paths.io.out.dev : paths.io.out.prd;
 	
 	IN = useIO ? prepend_paths( IN, paths.io.in ) : IN;
@@ -899,6 +919,7 @@ function gulp_task_content( IN = paths.content.in, OUT = paths.content.out, useI
 	
 	}
 	
+	var [ nunjucks, mkdirp ] = requireAll( 'nunjucks', 'mkdirp' );
 	var selfReferencePathRegex = /\/.\//g;
 	var path = settings.mode === settings.MODE_DEVELOPMENT ? paths.io.out.dev : paths.io.out.prd;
 	
@@ -947,6 +968,8 @@ function gulp_task_files( IN = paths.files.in, OUT = paths.files.out, useIO = tr
 	
 }
 function gulp_task_icons( IN = paths.icons.in, OUT = paths.icons.out, useIO = true ){
+	
+	var [ iconfont ] = requireGulp( 'iconfont' );
 	
 	var path = settings.mode === settings.MODE_DEVELOPMENT ? paths.io.out.dev : paths.io.out.prd;
 	
@@ -1028,6 +1051,7 @@ function gulp_task_icons( IN = paths.icons.in, OUT = paths.icons.out, useIO = tr
 
 function gulp_task_watch(){
 	
+	var [ watch ] = requireGulp( 'watch' );
 	var bs = gulp_syncServer();
 	var save = gulp_saveServer();
 	
@@ -1078,7 +1102,8 @@ function gulp_task_debug(){
 		
 	}
 	
-	
+	var [ childProcess ] = requireAll( 'child_process' );
+	var spawn = childProcess.spawn;
 	var _process = null;
 	var tasks = process.argv.join( ' ' )
 		.split( 'debug' ).pop()
