@@ -109,9 +109,10 @@ function gulp_all( IN, OUT, handle, type = false ){
 				resolve( data.gulp );
 				
 			}
-			function error(){
+			function error( error ){
 				
 				console.log( `[X][${type}]: ${path} -> ${out}` );
+				console.log( error );
 		
 				resolve( data.gulp );
 				
@@ -852,17 +853,25 @@ function gulp_task_content( IN = paths.content.in, OUT = paths.content.out, useI
 		return new Promise(function( resolve, reject ){
 			
 			fs.readFile( path, function( err, content ){
-			
+				
+				if( err ){
+					
+					return reject( err );
+					
+				}
+				
 				try {
 				
 					var all = JSON.parse( content );
 				
 					meta = all.meta;
 					data = all.data;
+					data[ '__meta__' ] = meta;
+					data[ '__paths__' ] = paths;
 				
 				} catch( e ){
 				
-					return reject();
+					return reject( e );
 				
 				}
 				
@@ -870,7 +879,7 @@ function gulp_task_content( IN = paths.content.in, OUT = paths.content.out, useI
 					
 					if( err ){
 						
-						reject();
+						reject( err );
 						
 					} else {
 					
@@ -887,7 +896,7 @@ function gulp_task_content( IN = paths.content.in, OUT = paths.content.out, useI
 				
 							if( err ){
 				
-								reject();
+								reject( err );
 				
 							} else {
 				
@@ -895,7 +904,7 @@ function gulp_task_content( IN = paths.content.in, OUT = paths.content.out, useI
 					
 									if( err ){
 						
-										reject();
+										reject( err );
 						
 									} else {
 										
@@ -919,9 +928,9 @@ function gulp_task_content( IN = paths.content.in, OUT = paths.content.out, useI
 	
 	}
 	
+	var path = settings.mode === settings.MODE_DEVELOPMENT ? paths.io.out.dev : paths.io.out.prd;
 	var [ nunjucks, mkdirp ] = requireAll( 'nunjucks', 'mkdirp' );
 	var selfReferencePathRegex = /\/.\//g;
-	var path = settings.mode === settings.MODE_DEVELOPMENT ? paths.io.out.dev : paths.io.out.prd;
 	
 	IN = useIO ? prepend_paths( IN, paths.io.in ) : IN;
 	OUT = useIO ? prepend_paths( OUT, path) : OUT;
